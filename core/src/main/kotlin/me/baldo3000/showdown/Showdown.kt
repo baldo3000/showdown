@@ -9,9 +9,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
 import ktx.log.logger
-import me.baldo3000.showdown.view.screens.GameScreen
-import me.baldo3000.showdown.view.screens.HomeScreen
-import me.baldo3000.showdown.view.screens.ShowdownScreen
+import me.baldo3000.showdown.ecs.system.RenderSystem
+import me.baldo3000.showdown.screen.GameScreen
+import me.baldo3000.showdown.screen.HomeScreen
+import me.baldo3000.showdown.screen.ShowdownScreen
 
 const val UNIT_SCALE = 1 / 16f
 
@@ -21,7 +22,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
     val batch: Batch by lazy { SpriteBatch() }
     val engine: Engine by lazy {
         PooledEngine(10, 1000, 10, 1000).apply {
-
+            addSystem(RenderSystem(batch, gameViewport))
         }
     }
 
