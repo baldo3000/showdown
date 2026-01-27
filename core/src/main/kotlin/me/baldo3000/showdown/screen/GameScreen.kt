@@ -1,4 +1,4 @@
-package me.baldo3000.showdown.view.screens
+package me.baldo3000.showdown.screen
 
 import ktx.ashley.entity
 import ktx.log.logger

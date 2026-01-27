@@ -1,4 +1,4 @@
-package me.baldo3000.showdown.view.screens
+package me.baldo3000.showdown.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input

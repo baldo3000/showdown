@@ -1,4 +1,4 @@
-package me.baldo3000.showdown.view.screens
+package me.baldo3000.showdown.screen
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.graphics.g2d.Batch
