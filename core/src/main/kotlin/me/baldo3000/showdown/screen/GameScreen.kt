@@ -8,8 +8,7 @@ import ktx.ashley.with
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
 import me.baldo3000.showdown.UNIT_SCALE
-import me.baldo3000.showdown.ecs.component.GraphicComponent
-import me.baldo3000.showdown.ecs.component.TransformComponent
+import me.baldo3000.showdown.ecs.component.*
 import kotlin.math.min
 
 private const val MAX_DELTA_TIME = 1 / 20f
@@ -41,6 +40,9 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
                     setOriginCenter()
                 }
             }
+            with<FacingComponent> {}
+            with<PlayerComponent> {}
+            with<MoveComponent> {}
         }
     }
 

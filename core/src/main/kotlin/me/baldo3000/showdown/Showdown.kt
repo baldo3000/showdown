@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
 import ktx.log.logger
 import me.baldo3000.showdown.ecs.system.MoveSystem
+import me.baldo3000.showdown.ecs.system.PlayerInputSystem
 import me.baldo3000.showdown.ecs.system.RemoveSystem
 import me.baldo3000.showdown.ecs.system.RenderSystem
 import me.baldo3000.showdown.screen.GameScreen
@@ -24,6 +25,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
     val batch: Batch by lazy { SpriteBatch() }
     val engine: Engine by lazy {
         PooledEngine(10, 1000, 10, 1000).apply {
+            addSystem(PlayerInputSystem(gameViewport))
             addSystem(MoveSystem())
             addSystem(RenderSystem(batch, gameViewport))
             addSystem(RemoveSystem())
