@@ -1,25 +1,35 @@
+// kotlin
+// File: `server/build.gradle.kts.txt.txt.txt`
+
+val appName: String by project
+
 plugins {
-    // Apply the shared build logic from a convention plugin.
-    // The shared code is located in `buildSrc/src/main/kotlin/kotlin-jvm.gradle.kts`.
-    id("buildsrc.convention.kotlin-jvm")
-
-    // Apply the Application plugin to add support for building an executable JVM application.
-    application
+    id("application")
 }
 
-//group = "me.baldo3000"
-version = "1.0"
-
-dependencies {
-//    testImplementation(kotlin("test"))
-    implementation(project(":common"))
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
 }
 
-//tasks.test {
-//    useJUnitPlatform()
-//}
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
 
 application {
-    // Define the Fully Qualified Name for the application main class
-    mainClass = "me.baldo3000.server.ServerKt"
+    mainClass.set("me.baldo3000.showdown.server.ServerKt")
+}
+
+plugins.withId("eclipse") {
+    eclipse {
+        project {
+            name = "$appName-server"
+        }
+    }
+}
+
+dependencies {
+    api(libs.kotlin.stdlib)
+    api(libs.kotlinx.coroutines)
 }

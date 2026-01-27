@@ -1,22 +1,55 @@
-# Version catalog is a central place for you to declare and version dependencies
-# https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
-# https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
-
 [versions]
 kotlin = "2.3.0"
-kotlinxDatetime = "0.7.1"
-kotlinxSerializationJSON = "1.9.0"
-kotlinxCoroutines = "1.10.2"
+gdx = "1.14.0"
+ashley = "1.7.4"
+ktx = "1.13.1-rc1"
+coroutines = "1.8.1"
+graalHelper = "2.0.1"
+construo = "2.1.0"
+graalBuildTools = "0.9.28"
+foojay = "1.0.0"
+ktor = "3.3.3"
+kotlinLoggingJvm = "7.0.14"
+kotlinSerializationJson = "1.10.0"
+logbackClassic = "1.5.25"
 
 [libraries]
-kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-kotlinxSerialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
-kotlinxCoroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
+# GDX Core
+gdx-core = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }
+gdx-backend-lwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", version.ref = "gdx" }
+gdx-platform = { module = "com.badlogicgames.gdx:gdx-platform", version.ref = "gdx" }
+gdx-lwjgl3-angle = { module = "com.badlogicgames.gdx:gdx-lwjgl3-angle", version.ref = "gdx" }
+gdx-svmhelper-backend-lwjgl3 = { module = "io.github.berstanio:gdx-svmhelper-backend-lwjgl3", version.ref = "graalHelper" }
 
-# Libraries can be bundled together for easier import
-[bundles]
-kotlinxEcosystem = ["kotlinxDatetime", "kotlinxSerialization", "kotlinxCoroutines"]
+# Ashley
+ashley = { module = "com.badlogicgames.ashley:ashley", version.ref = "ashley" }
+
+# KTX
+ktx-app = { module = "io.github.libktx:ktx-app", version.ref = "ktx" }
+ktx-ashley = { module = "io.github.libktx:ktx-ashley", version.ref = "ktx" }
+ktx-async = { module = "io.github.libktx:ktx-async", version.ref = "ktx" }
+ktx-collections = { module = "io.github.libktx:ktx-collections", version.ref = "ktx" }
+ktx-graphics = { module = "io.github.libktx:ktx-graphics", version.ref = "ktx" }
+ktx-json = { module = "io.github.libktx:ktx-json", version.ref = "ktx" }
+ktx-log = { module = "io.github.libktx:ktx-log", version.ref = "ktx" }
+ktx-math = { module = "io.github.libktx:ktx-math", version.ref = "ktx" }
+
+# Kotlin
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerializationJson" }
+
+# Graal / Native
+graal-helper-annotations = { module = "io.github.berstanio:gdx-svmhelper-annotations", version.ref = "graalHelper" }
+graal-helper-backend = { module = "io.github.berstanio:gdx-svmhelper-backend-lwjgl3", version.ref = "graalHelper" }
+
+ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
+kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlinLoggingJvm" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
 
 [plugins]
-kotlinPluginSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+construo = { id = "io.github.fourlastor.construo", version.ref = "construo" }
+graalvm = { id = "org.graalvm.buildtools.native", version.ref = "graalBuildTools" }
+foojay = { id = "org.gradle.toolchains.foojay-resolver-convention", version.ref = "foojay" }
+kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
