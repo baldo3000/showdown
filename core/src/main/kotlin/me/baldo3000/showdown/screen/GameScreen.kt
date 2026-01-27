@@ -43,6 +43,7 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
             with<FacingComponent> {}
             with<PlayerComponent> {}
             with<MoveComponent> {}
+            with<IdComponent> {}
         }
     }
 
