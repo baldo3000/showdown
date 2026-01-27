@@ -1,0 +1,24 @@
+package network.api
+
+import io.ktor.network.sockets.*
+
+data class ConnectedPeer(
+    val tcpSocket: Socket,
+    val udpAddress: Address
+)
+
+interface Host {
+    fun start()
+
+    fun sendToClients(payload: ByteArray)
+
+    fun stop()
+}
+
+interface Client {
+    fun connect(hostIp: String, port: Int)
+
+    fun sendToHost(payload: ByteArray)
+
+    fun stop()
+}

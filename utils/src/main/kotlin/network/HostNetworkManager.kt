@@ -1,0 +1,126 @@
+package network
+
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.network.selector.*
+import io.ktor.network.sockets.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.io.readByteArray
+import network.api.Address
+import network.api.ConnectedPeer
+import network.api.Host
+import network.api.toAddress
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+
+class HostNetworkManager(val port: Int = 0): Host {
+    private val logger = KotlinLogging.logger("HostNetworkManager")
+    private val selector = SelectorManager(Dispatchers.IO)
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val runningJobs = mutableSetOf<Job>()
+
+    private val connectedPeers = ConcurrentHashMap<String, ConnectedPeer>()
+    private val tcpOuts = ConcurrentHashMap<String, ByteWriteChannel>()
+
+    private val _sendChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _receiveChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val receiveChannel: ReceiveChannel<ByteArray> = _receiveChannel
+
+    override fun start() {
+        runningJobs += scope.launch {
+            var tcpServer: ServerSocket? = null
+            var udpSocket: BoundDatagramSocket? = null
+            try {
+                tcpServer = aSocket(selector).tcp().bind("0.0.0.0", port)
+                udpSocket = aSocket(selector).udp().bind("0.0.0.0", port)
+
+                logger.info { "Host is listening on ${tcpServer.localAddress}" }
+
+                // UDP Listener
+                launch {
+                    while (isActive) {
+                        val datagram = udpSocket.receive()
+                        val payload = datagram.packet.readByteArray()
+                        logger.info { "Received UDP message: ${payload.decodeToString()}" }
+                        _receiveChannel.trySend(payload)
+                    }
+                }
+
+                // UDP Sender
+                launch {
+                    for (payload in _sendChannel) {
+                        // logger.info { "Broadcasting UDP message: ${payload.decodeToString()}" }
+                        connectedPeers.values.forEach { peer ->
+                            udpSocket.send(
+                                Datagram(
+                                    buildPacket { writeFully(payload) },
+                                    peer.udpAddress.inetSocketAddress
+                                )
+                            )
+                        }
+                    }
+                }
+
+                // TCP Connection Acceptor
+                while (isActive) {
+                    val socket = tcpServer.accept()
+                    handleNewConnection(socket)
+                }
+            } catch (_: ClosedByteChannelException) {
+//            } catch (e: Exception) {
+//                logger.error(e) { "Error during host related network operation:\n${e.message}" }
+            } finally {
+                logger.debug { "Closing host sockets..." }
+                tcpServer?.close()
+                udpSocket?.close()
+                logger.debug { "Host sockets closed" }
+            }
+        }
+    }
+
+    override fun sendToClients(payload: ByteArray) {
+        _sendChannel.trySend(payload)
+    }
+
+    override fun stop() {
+        logger.info { "Stopping host..." }
+        scope.cancel()
+        runBlocking { runningJobs.joinAll() }
+        logger.info { "Host is now stopped" }
+    }
+
+    private fun handleNewConnection(socket: Socket) {
+        runningJobs += scope.launch {
+            val peerId = UUID.randomUUID().toString()
+            val input = socket.openReadChannel()
+            val output = socket.openWriteChannel(autoFlush = true)
+
+            try {
+                // Handshake: Get their UDP port
+                val udpPort = input.readInt()
+                val remoteIp = socket.remoteAddress.toAddress()
+                val udpAddress = Address(remoteIp.ip, udpPort)
+                logger.info { "Peer $peerId at $udpAddress connected" }
+
+                connectedPeers[peerId] = ConnectedPeer(socket, udpAddress)
+                tcpOuts[peerId] = output
+
+                // Keep-alive loop
+                while (!socket.isClosed) {
+                    input.readByte()
+                }
+            } catch (e: Exception) {
+                // Disconnection happening
+                logger.info { "Connection aborted with $peerId at ${connectedPeers[peerId]} connected" }
+            } finally {
+                tcpOuts.remove(peerId)
+                connectedPeers.keys.removeIf { it == peerId }
+                socket.close()
+            }
+        }
+    }
+}

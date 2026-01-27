@@ -1,0 +1,16 @@
+plugins {
+  id "application"
+}
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-server'
+
+application.mainClass = 'me.baldo3000.showdown.server.ServerKt'
+eclipse.project.name = appName + '-server'
+java.sourceCompatibility = 25
+java.targetCompatibility = 25
+
+dependencies {
+  api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
+}
