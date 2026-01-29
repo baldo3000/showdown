@@ -40,7 +40,7 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
                     setOriginCenter()
                 }
             }
-            with<FacingComponent> {}
+            with<InputComponent> {}
             with<PlayerComponent> {}
             with<MoveComponent> {}
             with<IdComponent> {}
