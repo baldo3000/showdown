@@ -30,6 +30,9 @@ class HostNetworkManager(val port: Int = 0) : Host {
     private val _receiveChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val receiveChannel: ReceiveChannel<ByteArray> = _receiveChannel
 
+    val connectedPeerIds: Set<Uuid>
+        get() = connectedPeers.keys
+
     override fun start() {
         runningJobs += scope.launch {
             var tcpServer: ServerSocket? = null
@@ -102,6 +105,9 @@ class HostNetworkManager(val port: Int = 0) : Host {
             try {
                 // Handshake: Get their UDP port
                 val udpPort = input.readInt()
+                logger.info { "Received client udp port: $udpPort" }
+                output.writeByteArray(peerId.toByteArray())
+
                 val remoteIp = socket.remoteAddress.toAddress()
                 val udpAddress = Address(remoteIp.ip, udpPort)
                 logger.info { "Peer $peerId at $udpAddress connected" }

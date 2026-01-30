@@ -11,6 +11,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.io.readByteArray
 import network.api.Client
+import java.util.concurrent.CopyOnWriteArraySet
+import kotlin.uuid.Uuid
 
 class ClientNetworkManager : Client {
     private val logger = KotlinLogging.logger("ClientNetworkManager")
@@ -21,6 +23,10 @@ class ClientNetworkManager : Client {
     private val _sendChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val _receiveChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val receiveChannel: ReceiveChannel<ByteArray> = _receiveChannel
+
+    private val _personalId = CopyOnWriteArraySet<Uuid>()
+    val personalId: Uuid
+        get() = _personalId.first()
 
     override fun connect(hostIp: String, port: Int) {
         runningJobs += scope.launch {
@@ -33,10 +39,14 @@ class ClientNetworkManager : Client {
 
                 tcpSocket = aSocket(selector).tcp().connect(hostIp, port)
                 val tcpOut = tcpSocket.openWriteChannel(autoFlush = true)
+                val tcpIn = tcpSocket.openReadChannel()
                 logger.debug { "Client udp channel is connected to host" }
 
                 // Handshake
                 tcpOut.writeInt(localUdpPort)
+                val id = Uuid.fromByteArray(tcpIn.readByteArray(16))
+                _personalId.add(id)
+                logger.info { "Received id from host: $id" }
 
                 // UDP Listener
                 launch {
@@ -59,7 +69,7 @@ class ClientNetworkManager : Client {
 
                 // Wait for Host to close connection
                 try {
-                    tcpSocket.openReadChannel().readByte()
+                    tcpIn.readByte()
                 } finally {
                     logger.info { "Connection closed from host" }
                 }
