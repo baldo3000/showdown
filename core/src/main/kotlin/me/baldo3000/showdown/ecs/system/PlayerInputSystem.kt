@@ -6,15 +6,12 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.ashley.allOf
 import ktx.ashley.get
 import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.*
 
-class PlayerInputSystem(
-    private val gameViewport: Viewport
-) : IteratingSystem(
+class PlayerInputSystem() : IteratingSystem(
     allOf(PlayerComponent::class, TransformComponent::class, InputComponent::class, MoveComponent::class).get()
 ) {
     private val facing = Vector2()
