@@ -52,7 +52,7 @@ class ClientNetworkManager : Client {
                 launch {
                     val hostAddress = InetSocketAddress(hostIp, port)
                     for (payload in _sendChannel) {
-                        logger.info { "Sending UDP message: ${payload.decodeToString()}" }
+                        // logger.info { "Sending UDP message: ${payload.decodeToString()}" }
                         udpSocket.send(Datagram(buildPacket { writeFully(payload) }, hostAddress))
                     }
                 }
