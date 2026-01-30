@@ -5,6 +5,12 @@ dependencies {
     implementation(libs.logback.classic)
 }
 
+kotlin {
+    compilerOptions {
+        optIn.add("kotlin.uuid.ExperimentalUuidApi")
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }

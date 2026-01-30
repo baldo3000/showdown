@@ -14,17 +14,17 @@ import network.api.Address
 import network.api.ConnectedPeer
 import network.api.Host
 import network.api.toAddress
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.uuid.Uuid
 
-class HostNetworkManager(val port: Int = 0): Host {
+class HostNetworkManager(val port: Int = 0) : Host {
     private val logger = KotlinLogging.logger("HostNetworkManager")
     private val selector = SelectorManager(Dispatchers.IO)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val runningJobs = mutableSetOf<Job>()
 
-    private val connectedPeers = ConcurrentHashMap<String, ConnectedPeer>()
-    private val tcpOuts = ConcurrentHashMap<String, ByteWriteChannel>()
+    private val connectedPeers = ConcurrentHashMap<Uuid, ConnectedPeer>()
+    private val tcpOuts = ConcurrentHashMap<Uuid, ByteWriteChannel>()
 
     private val _sendChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val _receiveChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
@@ -95,7 +95,7 @@ class HostNetworkManager(val port: Int = 0): Host {
 
     private fun handleNewConnection(socket: Socket) {
         runningJobs += scope.launch {
-            val peerId = UUID.randomUUID().toString()
+            val peerId = Uuid.random()
             val input = socket.openReadChannel()
             val output = socket.openWriteChannel(autoFlush = true)
 
