@@ -45,7 +45,7 @@ class HostNetworkManager(val port: Int = 0): Host {
                     while (isActive) {
                         val datagram = udpSocket.receive()
                         val payload = datagram.packet.readByteArray()
-                        logger.info { "Received UDP message: ${payload.decodeToString()}" }
+                        // logger.info { "Received UDP message: ${payload.decodeToString()}" }
                         _receiveChannel.trySend(payload)
                     }
                 }
