@@ -17,7 +17,11 @@ import network.api.toAddress
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.uuid.Uuid
 
-class HostNetworkManager(val port: Int = 0) : Host {
+class HostNetworkManager(
+    val port: Int = 0,
+    val onPeerConnect: (Uuid) -> Unit = {},
+    val onPeerDisconnect: () -> Unit = {}
+) : Host {
     private val logger = KotlinLogging.logger("HostNetworkManager")
     private val selector = SelectorManager(Dispatchers.IO)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -114,6 +118,7 @@ class HostNetworkManager(val port: Int = 0) : Host {
 
                 connectedPeers[peerId] = ConnectedPeer(socket, udpAddress)
                 tcpOuts[peerId] = output
+                onPeerConnect(peerId)
 
                 // Keep-alive loop
                 while (!socket.isClosed) {

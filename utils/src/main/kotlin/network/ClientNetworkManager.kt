@@ -11,10 +11,13 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.io.readByteArray
 import network.api.Client
-import java.util.concurrent.CopyOnWriteArraySet
+import kotlin.concurrent.atomics.AtomicReference
 import kotlin.uuid.Uuid
 
-class ClientNetworkManager : Client {
+class ClientNetworkManager(
+    val onConnect: (Uuid) -> Unit = {},
+    val onDisconnect: () -> Unit = {}
+) : Client {
     private val logger = KotlinLogging.logger("ClientNetworkManager")
     private val selector = SelectorManager(Dispatchers.IO)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -24,9 +27,9 @@ class ClientNetworkManager : Client {
     private val _receiveChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val receiveChannel: ReceiveChannel<ByteArray> = _receiveChannel
 
-    private val _personalId = CopyOnWriteArraySet<Uuid>()
-    val personalId: Uuid
-        get() = _personalId.first()
+    private val _id = AtomicReference<Uuid?>(null)
+    val id: Uuid?
+        get() = _id.load()
 
     override fun connect(hostIp: String, port: Int) {
         runningJobs += scope.launch {
@@ -45,7 +48,8 @@ class ClientNetworkManager : Client {
                 // Handshake
                 tcpOut.writeInt(localUdpPort)
                 val id = Uuid.fromByteArray(tcpIn.readByteArray(16))
-                _personalId.add(id)
+                _id.store(id)
+                onConnect(id)
                 logger.info { "Received id from host: $id" }
 
                 // UDP Listener

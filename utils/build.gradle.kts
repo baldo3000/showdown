@@ -8,6 +8,7 @@ dependencies {
 kotlin {
     compilerOptions {
         optIn.add("kotlin.uuid.ExperimentalUuidApi")
+        optIn.add("kotlin.concurrent.atomics.ExperimentalAtomicApi")
     }
 }
 
