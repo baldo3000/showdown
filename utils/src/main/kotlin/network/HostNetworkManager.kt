@@ -20,7 +20,7 @@ import kotlin.uuid.Uuid
 class HostNetworkManager(
     val port: Int = 0,
     val onPeerConnect: (Uuid) -> Unit = {},
-    val onPeerDisconnect: () -> Unit = {}
+    val onPeerDisconnect: (Uuid) -> Unit = {}
 ) : Host {
     private val logger = KotlinLogging.logger("HostNetworkManager")
     private val selector = SelectorManager(Dispatchers.IO)
