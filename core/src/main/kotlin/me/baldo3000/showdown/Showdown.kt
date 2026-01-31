@@ -9,10 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
 import ktx.log.logger
-import me.baldo3000.showdown.ecs.system.MoveSystem
-import me.baldo3000.showdown.ecs.system.PlayerInputSystem
-import me.baldo3000.showdown.ecs.system.RemoveSystem
-import me.baldo3000.showdown.ecs.system.RenderSystem
+import me.baldo3000.showdown.ecs.system.*
+import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.screen.GameScreen
 import me.baldo3000.showdown.screen.HomeScreen
 import me.baldo3000.showdown.screen.ShowdownScreen
@@ -23,12 +21,16 @@ const val UNIT_SCALE = 1 / 16f
 class Showdown : KtxGame<ShowdownScreen>() {
     val gameViewport = FitViewport(16f, 9f)
     val batch: Batch by lazy { SpriteBatch() }
+    val eventHandler by lazy { GameEventHandler() }
     val engine: Engine by lazy {
         PooledEngine(10, 1000, 10, 1000).apply {
-            addSystem(PlayerInputSystem(gameViewport))
-            addSystem(MoveSystem())
+            addSystem(PlayerInputSystem())
+            addSystem(EventSystem(eventHandler))
+            addSystem(MoveSystem(eventHandler))
             addSystem(RenderSystem(batch, gameViewport))
             addSystem(RemoveSystem())
+            addSystem(HostNetworkSystem(8080, eventHandler))
+            //addSystem(ClientNetworkSystem(eventHandler))
         }
     }
 
