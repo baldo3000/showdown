@@ -128,6 +128,7 @@ class HostNetworkManager(
                 // Disconnection happening
                 logger.info { "Connection aborted with $peerId at ${connectedPeers[peerId]} connected" }
             } finally {
+                onPeerDisconnect(peerId)
                 tcpOuts.remove(peerId)
                 connectedPeers.keys.removeIf { it == peerId }
                 socket.close()
