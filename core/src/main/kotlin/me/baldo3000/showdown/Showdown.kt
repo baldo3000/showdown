@@ -24,7 +24,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
     val eventHandler by lazy { GameEventHandler() }
     val engine: Engine by lazy {
         PooledEngine(10, 1000, 10, 1000).apply {
-            addSystem(PlayerInputSystem())
+            addSystem(PlayerInputSystem(gameViewport))
             addSystem(EventSystem(eventHandler))
             addSystem(MoveSystem(eventHandler))
             addSystem(RenderSystem(batch, gameViewport))
