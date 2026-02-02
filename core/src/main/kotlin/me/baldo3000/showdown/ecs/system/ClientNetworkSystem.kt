@@ -5,6 +5,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.utils.viewport.Viewport
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
@@ -24,6 +26,7 @@ import kotlin.uuid.Uuid
 private const val UPDATE_RATE = 1 / 30f
 
 class ClientNetworkSystem(
+    private val gameViewport: Viewport,
     private val eventHandler: GameEventHandler
 ) : IntervalSystem(UPDATE_RATE) {
     private val networkManager: ClientNetworkManager
@@ -56,7 +59,7 @@ class ClientNetworkSystem(
 
     private fun sendPlayerInputPacket() {
         networkManager.id?.let { id ->
-            playerEntity?.let { entity ->
+            playerEntity?.let {
                 val top = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)
                 val left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)
                 val bottom = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)
@@ -64,7 +67,12 @@ class ClientNetworkSystem(
 
                 val horizontal = (if (right) 1 else 0) - (if (left) 1 else 0)
                 val vertical = (if (top) 1 else 0) - (if (bottom) 1 else 0)
-                val inputPacket = PlayerInputPacket(id, horizontal, vertical, inputSequenceNumber++)
+                val touching = if (Gdx.input.isTouched) {
+                    val tmpVector = Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
+                    gameViewport.unproject(tmpVector)
+                    Vector2D(tmpVector.x, tmpVector.y)
+                } else null
+                val inputPacket = PlayerInputPacket(id, horizontal, vertical, touching, inputSequenceNumber++)
                 val bytes = Json.encodeToString(inputPacket).toByteArray()
                 // log.debug { "Sending player info to host: $inputPacket" }
                 networkManager.sendToHost(bytes)

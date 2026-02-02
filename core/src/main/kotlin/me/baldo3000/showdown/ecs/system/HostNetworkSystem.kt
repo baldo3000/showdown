@@ -8,9 +8,8 @@ import com.badlogic.gdx.math.Vector2
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
-import me.baldo3000.showdown.ecs.component.IdComponent
-import me.baldo3000.showdown.ecs.component.MoveComponent
-import me.baldo3000.showdown.ecs.component.RemoveComponent
+import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.network.*
@@ -94,9 +93,24 @@ class HostNetworkSystem(
                 engine.entities.forEach {
                     val id = it[IdComponent.mapper] ?: return@forEach
                     val move = it[MoveComponent.mapper] ?: return@forEach
+                    val transform = it[TransformComponent.mapper] ?: return@forEach
                     if (id.id == playerInput.id) {
                         move.speed.x = speedVector.x * 3f
                         move.speed.y = speedVector.y * 3f
+                        if (playerInput.touching != null) {
+                            val distX = playerInput.touching.x - transform.position.x
+                            val distY = playerInput.touching.y - transform.position.y
+                            val bulletSpeedVector = Vector2(distX, distY).nor()
+                            engine.addEntity(
+                                engine.createBullet(
+                                    Uuid.random(),
+                                    id.id,
+                                    DEFAULT_DAMAGE,
+                                    Vector2D(transform.position.x, transform.position.y),
+                                    Vector2D(bulletSpeedVector.x * 5f, bulletSpeedVector.y * 5f)
+                                )
+                            )
+                        }
                     }
                 }
             } else {
