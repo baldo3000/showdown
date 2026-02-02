@@ -43,6 +43,7 @@ fun Engine.createPlayer(
             this.position.x = position.x
             this.position.y = position.y
         })
+        add(ColliderComponent().apply { collider.set(position.x, position.y, 1f / 2) })
         add(MoveComponent())
         add(HealthComponent())
         add(GraphicComponent().apply {
@@ -57,6 +58,8 @@ fun Engine.createPlayer(
 
 fun Engine.createBullet(
     bulletId: Uuid,
+    sourceId: Uuid?,
+    damage: Float = DEFAULT_DAMAGE,
     position: Vector2D,
     speed: Vector2D
 ): Entity {
@@ -79,6 +82,7 @@ fun Engine.createBullet(
             this.position.y = position.y
             this.position.z = -1f
         })
+        add(ColliderComponent().apply { collider.set(position.x, position.y, 0.25f / 2) })
         add(MoveComponent().apply {
             this.speed.x = speed.x
             this.speed.y = speed.y
@@ -89,6 +93,10 @@ fun Engine.createBullet(
                 setSize(texture.width * UNIT_SCALE, texture.height * UNIT_SCALE)
                 setOriginCenter()
             }
+        })
+        add(DamageComponent().apply {
+            this.sourceId = sourceId
+            this.damage = damage
         })
     }
 }

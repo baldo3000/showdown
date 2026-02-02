@@ -6,6 +6,7 @@ import ktx.ashley.allOf
 import ktx.ashley.exclude
 import ktx.ashley.get
 import ktx.log.logger
+import me.baldo3000.showdown.ecs.component.ColliderComponent
 import me.baldo3000.showdown.ecs.component.MoveComponent
 import me.baldo3000.showdown.ecs.component.RemoveComponent
 import me.baldo3000.showdown.ecs.component.TransformComponent
@@ -30,15 +31,28 @@ class MoveSystem(private val eventHandler: GameEventHandler) :
         require(transform != null) { "Entity must have a TransformComponent. Entity: $entity" }
         val move = entity[MoveComponent.mapper]
         require(move != null) { "Entity must have a MoveComponent. Entity: $entity" }
+        val collider = entity[ColliderComponent.mapper]
 
         // log.debug { "Moving entity $entity with speed ${move.speed}" }
-        moveEntity(transform, move, deltaTime)
+        moveEntity(transform, move, collider, deltaTime)
     }
 
-    private fun moveEntity(transform: TransformComponent, move: MoveComponent, deltaTime: Float) {
+    private fun moveEntity(
+        transform: TransformComponent,
+        move: MoveComponent,
+        collider: ColliderComponent?,
+        deltaTime: Float
+    ) {
         //transform.position.x = MathUtils.clamp()
-        transform.position.x += move.speed.x * deltaTime
-        transform.position.y += move.speed.y * deltaTime
+        val deltaX = move.speed.x * deltaTime
+        val deltaY = move.speed.y * deltaTime
+        transform.position.x += deltaX
+        transform.position.y += deltaY
+
+        if (collider != null) {
+            collider.collider.x += deltaX
+            collider.collider.y += deltaY
+        }
     }
 
     companion object {

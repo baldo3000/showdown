@@ -13,8 +13,7 @@ import me.baldo3000.showdown.ecs.component.MoveComponent
 import me.baldo3000.showdown.ecs.component.RemoveComponent
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.event.GameEventHandler
-import me.baldo3000.showdown.network.PlayerInputPacket
-import me.baldo3000.showdown.network.WorldSnapshot
+import me.baldo3000.showdown.network.*
 import network.HostNetworkManager
 import kotlin.uuid.Uuid
 
@@ -31,6 +30,8 @@ class HostNetworkSystem(
 
     init {
         Json.encodeToString(PlayerInputPacket(Uuid.random(), 0, 0))
+        Json.encodeToString(PlayerSnapshot(Uuid.random(), Vector2D(0f, 0f), Vector2D(0f, 0f), 100f))
+        Json.encodeToString(BulletSnapshot(Uuid.random(), null, 0f, Vector2D(0f, 0f), Vector2D(0f, 0f)))
         networkManager = HostNetworkManager(
             port,
             onPeerConnect = { peerId ->

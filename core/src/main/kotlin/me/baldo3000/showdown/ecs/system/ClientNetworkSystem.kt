@@ -8,8 +8,8 @@ import com.badlogic.gdx.Input
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
-import me.baldo3000.showdown.ecs.component.MoveComponent
 import me.baldo3000.showdown.ecs.component.HealthComponent
+import me.baldo3000.showdown.ecs.component.MoveComponent
 import me.baldo3000.showdown.ecs.component.TransformComponent
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
@@ -116,6 +116,8 @@ class ClientNetworkSystem(
                 val entity = idMap.getOrPut(snapshot.id) {
                     val newPlayer = engine.createBullet(
                         snapshot.id,
+                        snapshot.sourceId,
+                        snapshot.damage,
                         Vector2D(snapshot.position.x, snapshot.position.y),
                         Vector2D(snapshot.speed.x, snapshot.speed.y)
                     )

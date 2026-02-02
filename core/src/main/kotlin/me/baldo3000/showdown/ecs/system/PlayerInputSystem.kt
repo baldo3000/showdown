@@ -9,10 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.ashley.allOf
 import ktx.ashley.get
 import ktx.log.logger
-import me.baldo3000.showdown.ecs.component.HealthComponent
-import me.baldo3000.showdown.ecs.component.InputComponent
-import me.baldo3000.showdown.ecs.component.MoveComponent
-import me.baldo3000.showdown.ecs.component.TransformComponent
+import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.network.Vector2D
 import kotlin.uuid.Uuid
@@ -60,6 +57,8 @@ class PlayerInputSystem(
 
             val bullet = engine.createBullet(
                 Uuid.random(),
+                entity[IdComponent.mapper]?.id,
+                DEFAULT_DAMAGE,
                 Vector2D(transform.position.x, transform.position.y),
                 Vector2D(speedVector.x * 5f, speedVector.y * 5f)
             )

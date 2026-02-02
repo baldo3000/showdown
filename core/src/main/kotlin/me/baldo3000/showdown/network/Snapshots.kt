@@ -37,6 +37,8 @@ data class PlayerSnapshot(
 @Serializable
 data class BulletSnapshot(
     val id: Uuid,
+    val sourceId: Uuid?,
+    val damage: Float,
     val position: Vector2D,
     val speed: Vector2D
 ) {
@@ -48,7 +50,9 @@ data class BulletSnapshot(
                 ?: throw IllegalArgumentException("Entity must have a TransformComponent. Entity: $entity")
             val speed = entity[MoveComponent.mapper]?.speed?.let { Vector2D(it.x, it.y) }
                 ?: throw IllegalArgumentException("Entity must have a MoveComponent. Entity: $entity")
-            return BulletSnapshot(id, position, speed)
+            val damage = entity[DamageComponent.mapper]
+                ?: throw IllegalArgumentException("Entity must have a DamageComponent. Entity: $entity")
+            return BulletSnapshot(id, damage.sourceId, damage.damage, position, speed)
         }
     }
 }
@@ -72,6 +76,7 @@ data class WorldSnapshot(
             bullets = entities.filter {
                 it[RemoveComponent.mapper] == null &&
                     it[IdComponent.mapper] != null &&
+                    it[DamageComponent.mapper] != null &&
                     it[TransformComponent.mapper] != null &&
                     it[MoveComponent.mapper] != null
             }.map { BulletSnapshot.fromEntity(it) }

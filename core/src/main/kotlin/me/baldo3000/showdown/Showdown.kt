@@ -27,6 +27,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
             addSystem(PlayerInputSystem(gameViewport))
             addSystem(EventSystem(eventHandler))
             addSystem(MoveSystem(eventHandler))
+            addSystem(CollisionSystem())
             addSystem(RenderSystem(batch, gameViewport))
             addSystem(RemoveSystem())
             addSystem(HostNetworkSystem(8080, eventHandler))
