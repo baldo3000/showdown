@@ -32,9 +32,9 @@ class CollisionSystem :
         val health = entity[HealthComponent.mapper]
         val id = entity[IdComponent.mapper]
 
-        val toRemove = mutableSetOf<Entity>()
-
-        for (other in entityCache) {
+        val iterator = entityCache.iterator()
+        while (iterator.hasNext()) {
+            val other = iterator.next()
             if (other != entity) {
                 val otherTransform = other[TransformComponent.mapper]
                 require(otherTransform != null) { "Entity must have a TransformComponent. Entity: $other" }
@@ -49,15 +49,13 @@ class CollisionSystem :
                 ) {
                     health.health -= otherDamage.damage
                     other.add(RemoveComponent())
-                    toRemove += other
+                    iterator.remove()
                     if (health.health <= 0f) {
                         entity.add(RemoveComponent())
                     }
                 }
             }
         }
-
-        entityCache -= toRemove
     }
 
     companion object {

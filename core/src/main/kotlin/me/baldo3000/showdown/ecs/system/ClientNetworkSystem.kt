@@ -10,6 +10,7 @@ import ktx.ashley.get
 import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.HealthComponent
 import me.baldo3000.showdown.ecs.component.MoveComponent
+import me.baldo3000.showdown.ecs.component.RemoveComponent
 import me.baldo3000.showdown.ecs.component.TransformComponent
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
@@ -89,10 +90,13 @@ class ClientNetworkSystem(
             lastSnapshotSequenceNumber = state.sequenceNumber
             val serverIds = state.players.map { it.id } + state.bullets.map { it.id }
             // log.debug { serverIds.toString() }
-            for (entry in idMap) {
+            val iterator = idMap.iterator()
+            while (iterator.hasNext()) {
+                val entry = iterator.next()
                 if (entry.key !in serverIds) {
                     log.debug { "Removing entity with id ${entry.key}" }
-                    engine.removeEntity(entry.value)
+                    entry.value.add(RemoveComponent())
+                    iterator.remove()
                 }
             }
             state.players.forEach { snapshot ->
