@@ -54,13 +54,13 @@ class PlayerInputSystem(
             tmpVector.x = Gdx.input.x.toFloat()
             tmpVector.y = Gdx.input.y.toFloat()
             gameViewport.unproject(tmpVector)
-            val distX = tmpVector.x - transform.position.x - transform.size.x
-            val distY = tmpVector.y - transform.position.y - transform.size.x
+            val distX = tmpVector.x - transform.position.x
+            val distY = tmpVector.y - transform.position.y
             val speedVector = Vector2(distX, distY).nor()
 
             val bullet = engine.createBullet(
                 Uuid.random(),
-                Vector2D(transform.position.x + transform.size.x / 2, transform.position.y + transform.size.y / 2),
+                Vector2D(transform.position.x, transform.position.y),
                 Vector2D(speedVector.x * 5f, speedVector.y * 5f)
             )
             engine.addEntity(bullet)

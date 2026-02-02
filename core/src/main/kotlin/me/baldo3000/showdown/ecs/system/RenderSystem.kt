@@ -39,7 +39,12 @@ class RenderSystem(
 
         graphic.sprite.run {
             rotation = transform.rotationDeg
-            setBounds(transform.position.x, transform.position.y, transform.size.x, transform.size.y)
+            setBounds(
+                transform.position.x - transform.size.x / 2,
+                transform.position.y - transform.size.y / 2,
+                transform.size.x,
+                transform.size.y
+            )
             draw(batch)
         }
     }

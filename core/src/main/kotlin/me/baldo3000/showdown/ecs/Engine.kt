@@ -73,10 +73,11 @@ fun Engine.createBullet(
     return createEntity().apply {
         add(IdComponent().apply { id = bulletId })
         add(TransformComponent().apply {
-            this.position.x = position.x
-            this.position.y = position.y
             this.size.x = 0.25f
             this.size.y = 0.25f
+            this.position.x = position.x
+            this.position.y = position.y
+            this.position.z = -1f
         })
         add(MoveComponent().apply {
             this.speed.x = speed.x
