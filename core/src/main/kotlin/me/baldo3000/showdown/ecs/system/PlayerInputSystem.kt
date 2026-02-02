@@ -9,9 +9,9 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.ashley.allOf
 import ktx.ashley.get
 import ktx.log.logger
+import me.baldo3000.showdown.ecs.component.HealthComponent
 import me.baldo3000.showdown.ecs.component.InputComponent
 import me.baldo3000.showdown.ecs.component.MoveComponent
-import me.baldo3000.showdown.ecs.component.PlayerComponent
 import me.baldo3000.showdown.ecs.component.TransformComponent
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.network.Vector2D
@@ -23,13 +23,13 @@ private const val TOUCH_TOLERANCE_DISTANCE = 0.1f
 class PlayerInputSystem(
     private val gameViewport: Viewport
 ) : IteratingSystem(
-    allOf(PlayerComponent::class, TransformComponent::class, InputComponent::class, MoveComponent::class).get()
+    allOf(InputComponent::class, TransformComponent::class, MoveComponent::class).get()
 ) {
     private val tmpVector = Vector2()
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
-        val player = entity[PlayerComponent.mapper]
-        require(player != null) { "Entity must have a PlayerComponent. Entity: $entity" }
+        val health = entity[HealthComponent.mapper]
+        require(health != null) { "Entity must have a HealthComponent. Entity: $entity" }
         val transform = entity[TransformComponent.mapper]
         require(transform != null) { "Entity must have a TransformComponent. Entity: $entity" }
         val input = entity[InputComponent.mapper]

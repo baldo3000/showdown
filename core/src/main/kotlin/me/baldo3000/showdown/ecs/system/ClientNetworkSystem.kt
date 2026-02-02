@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.MoveComponent
-import me.baldo3000.showdown.ecs.component.PlayerComponent
+import me.baldo3000.showdown.ecs.component.HealthComponent
 import me.baldo3000.showdown.ecs.component.TransformComponent
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
@@ -109,7 +109,7 @@ class ClientNetworkSystem(
                 // log.debug { "Updating entity with id ${snapshot.id}" }
                 entity[TransformComponent.mapper]?.position?.set(snapshot.position.x, snapshot.position.y, 0f)
                 entity[MoveComponent.mapper]?.speed?.set(snapshot.speed.x, snapshot.speed.y)
-                entity[PlayerComponent.mapper]?.life = snapshot.hp
+                entity[HealthComponent.mapper]?.health = snapshot.health
             }
 
             state.bullets.forEach { snapshot ->

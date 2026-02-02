@@ -17,7 +17,7 @@ data class PlayerSnapshot(
     val id: Uuid,
     val position: Vector2D,
     val speed: Vector2D,
-    val hp: Float
+    val health: Float
 ) {
     companion object {
         fun fromEntity(entity: Entity): PlayerSnapshot {
@@ -27,9 +27,9 @@ data class PlayerSnapshot(
                 ?: throw IllegalArgumentException("Entity must have a TransformComponent. Entity: $entity")
             val speed = entity[MoveComponent.mapper]?.speed?.let { Vector2D(it.x, it.y) }
                 ?: throw IllegalArgumentException("Entity must have a MoveComponent. Entity: $entity")
-            val hp = entity[PlayerComponent.mapper]?.life
-                ?: throw IllegalArgumentException("Entity must have a PlayerComponent. Entity: $entity")
-            return PlayerSnapshot(id, position, speed, /*direction,*/ hp)
+            val health = entity[HealthComponent.mapper]?.health
+                ?: throw IllegalArgumentException("Entity must have a HealthComponent. Entity: $entity")
+            return PlayerSnapshot(id, position, speed, health)
         }
     }
 }
@@ -65,7 +65,7 @@ data class WorldSnapshot(
             players = entities.filter {
                 it[RemoveComponent.mapper] == null &&
                     it[IdComponent.mapper] != null &&
-                    it[PlayerComponent.mapper] != null &&
+                    it[HealthComponent.mapper] != null &&
                     it[TransformComponent.mapper] != null &&
                     it[MoveComponent.mapper] != null
             }.map { PlayerSnapshot.fromEntity(it) },

@@ -14,7 +14,7 @@ import kotlin.uuid.Uuid
 val Engine.players: List<Entity>
     get() = entities.filter { entity ->
         entity[IdComponent.mapper] != null &&
-            entity[PlayerComponent.mapper] != null &&
+            entity[HealthComponent.mapper] != null &&
             entity[TransformComponent.mapper] != null &&
             entity[MoveComponent.mapper] != null &&
             entity[RemoveComponent.mapper] == null
@@ -44,7 +44,7 @@ fun Engine.createPlayer(
             this.position.y = position.y
         })
         add(MoveComponent())
-        add(PlayerComponent())
+        add(HealthComponent())
         add(GraphicComponent().apply {
             sprite.run {
                 setRegion(redTexture)
