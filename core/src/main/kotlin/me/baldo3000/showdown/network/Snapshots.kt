@@ -56,11 +56,12 @@ data class BulletSnapshot(
 @Serializable
 data class WorldSnapshot(
     val players: List<PlayerSnapshot>,
+    val bullets: List<BulletSnapshot>,
     val sequenceNumber: Int = 0
-    //val bullets: List<BulletSnapshot>
 ) {
     companion object {
         fun fromEntities(entities: List<Entity>, sequenceNumber: Int): WorldSnapshot = WorldSnapshot(
+            sequenceNumber = sequenceNumber,
             players = entities.filter {
                 it[RemoveComponent.mapper] == null &&
                     it[IdComponent.mapper] != null &&
@@ -68,14 +69,12 @@ data class WorldSnapshot(
                     it[TransformComponent.mapper] != null &&
                     it[MoveComponent.mapper] != null
             }.map { PlayerSnapshot.fromEntity(it) },
-            sequenceNumber = sequenceNumber
-            /*,
             bullets = entities.filter {
                 it[RemoveComponent.mapper] == null &&
                     it[IdComponent.mapper] != null &&
                     it[TransformComponent.mapper] != null &&
                     it[MoveComponent.mapper] != null
-            }.map { BulletSnapshot(it) }*/
+            }.map { BulletSnapshot.fromEntity(it) }
         )
     }
 }

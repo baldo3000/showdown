@@ -11,9 +11,11 @@ import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.MoveComponent
 import me.baldo3000.showdown.ecs.component.PlayerComponent
 import me.baldo3000.showdown.ecs.component.TransformComponent
+import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.network.PlayerInputPacket
+import me.baldo3000.showdown.network.Vector2D
 import me.baldo3000.showdown.network.WorldSnapshot
 import network.ClientNetworkManager
 import kotlin.uuid.Uuid
@@ -85,7 +87,7 @@ class ClientNetworkSystem(
     private fun syncWorld(state: WorldSnapshot) {
         if (state.sequenceNumber > lastSnapshotSequenceNumber) {
             lastSnapshotSequenceNumber = state.sequenceNumber
-            val serverIds = state.players.map { it.id }.toSet()
+            val serverIds = state.players.map { it.id } + state.bullets.map { it.id }
             // log.debug { serverIds.toString() }
             for (entry in idMap) {
                 if (entry.key !in serverIds) {
@@ -95,7 +97,11 @@ class ClientNetworkSystem(
             }
             state.players.forEach { snapshot ->
                 val entity = idMap.getOrPut(snapshot.id) {
-                    val newPlayer = engine.createPlayer(snapshot.id, controllable = snapshot.id == networkManager.id)
+                    val newPlayer = engine.createPlayer(
+                        snapshot.id,
+                        Vector2D(snapshot.position.x, snapshot.position.y),
+                        snapshot.id == networkManager.id
+                    )
                     playerEntity = newPlayer
                     engine.addEntity(newPlayer)
                     newPlayer
@@ -104,6 +110,22 @@ class ClientNetworkSystem(
                 entity[TransformComponent.mapper]?.position?.set(snapshot.position.x, snapshot.position.y, 0f)
                 entity[MoveComponent.mapper]?.speed?.set(snapshot.speed.x, snapshot.speed.y)
                 entity[PlayerComponent.mapper]?.life = snapshot.hp
+            }
+
+            state.bullets.forEach { snapshot ->
+                val entity = idMap.getOrPut(snapshot.id) {
+                    val newPlayer = engine.createBullet(
+                        snapshot.id,
+                        Vector2D(snapshot.position.x, snapshot.position.y),
+                        Vector2D(snapshot.speed.x, snapshot.speed.y)
+                    )
+                    playerEntity = newPlayer
+                    engine.addEntity(newPlayer)
+                    newPlayer
+                }
+                // log.debug { "Updating entity with id ${snapshot.id}" }
+                entity[TransformComponent.mapper]?.position?.set(snapshot.position.x, snapshot.position.y, 0f)
+                entity[MoveComponent.mapper]?.speed?.set(snapshot.speed.x, snapshot.speed.y)
             }
         } else {
             log.error { "Discard input packet out of sequence" }
