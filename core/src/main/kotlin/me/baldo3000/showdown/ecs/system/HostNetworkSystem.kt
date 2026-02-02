@@ -57,12 +57,11 @@ class HostNetworkSystem(
         val player = engine.createPlayer(Uuid.random(), controllable = true)
         engine.addEntity(player)
         networkManager.start()
-        //eventHandler.addListener(GameEvent.PlayerSpeedChange::class, this)
     }
 
     override fun removedFromEngine(engine: Engine) {
         super.removedFromEngine(engine)
-        //eventHandler.removeListener(GameEvent.PlayerSpeedChange::class, this)
+        networkManager.stop()
     }
 
     override fun updateInterval() {
