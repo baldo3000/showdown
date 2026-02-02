@@ -26,16 +26,16 @@ fun Engine.createPlayer(
     controllable: Boolean = false
 ): Entity {
     val size = 64
-    val redPixmap = Pixmap(size, size, Pixmap.Format.RGBA8888).apply {
-        setColor(0f, 0f, 0f, 0f)
-        fill()
+    val pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888).apply {
+        //setColor(0f, 0f, 0f, 0f)
+        //fill()
         // draw filled circle centered in pixmap
         setColor(Color.CYAN)
         fillCircle(size / 2, size / 2, size / 2 - 1)
 
     }
-    val redTexture = Texture(redPixmap)
-    redPixmap.dispose()
+    val redTexture = Texture(pixmap)
+    pixmap.dispose()
     return createEntity().apply {
         if (controllable) add(InputComponent())
         add(IdComponent().apply { id = playerId })
@@ -61,15 +61,15 @@ fun Engine.createBullet(
     speed: Vector2D
 ): Entity {
     val size = 4
-    val redPixmap = Pixmap(size, size, Pixmap.Format.RGBA8888).apply {
-        setColor(0f, 0f, 0f, 0f)
-        fill()
+    val pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888).apply {
+        //setColor(0f, 0f, 0f, 0f)
+        //fill()
         // draw filled circle centered in pixmap
         setColor(Color.RED)
         fillCircle(size / 2, size / 2, size / 2 - 1)
     }
-    val redTexture = Texture(redPixmap)
-    redPixmap.dispose()
+    val redTexture = Texture(pixmap)
+    pixmap.dispose()
     return createEntity().apply {
         add(IdComponent().apply { id = bulletId })
         add(TransformComponent().apply {
