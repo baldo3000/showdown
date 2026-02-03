@@ -10,10 +10,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
-import me.baldo3000.showdown.ecs.component.HealthComponent
-import me.baldo3000.showdown.ecs.component.MoveComponent
-import me.baldo3000.showdown.ecs.component.RemoveComponent
-import me.baldo3000.showdown.ecs.component.TransformComponent
+import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.event.GameEventHandler
@@ -82,14 +79,11 @@ class ClientNetworkSystem(
         if (state.sequenceNumber > lastSnapshotSequenceNumber) {
             lastSnapshotSequenceNumber = state.sequenceNumber
             val serverIds = state.players.map { it.id } + state.bullets.map { it.id }
-            // log.debug { serverIds.toString() }
-            val iterator = idMap.iterator()
-            while (iterator.hasNext()) {
-                val entry = iterator.next()
-                if (entry.key !in serverIds) {
-                    log.debug { "Removing entity with id ${entry.key}" }
-                    entry.value.add(RemoveComponent())
-                    iterator.remove()
+            for (entity in engine.entities) {
+                val id = entity[IdComponent.mapper]?.id
+                if (id !in serverIds) {
+                    entity.add(RemoveComponent())
+                    idMap.remove(id)
                 }
             }
             state.players.forEach { snapshot ->
@@ -142,7 +136,7 @@ class ClientNetworkSystem(
                     inputSequenceNumber++
                 )
                 val bytes = Json.encodeToString(inputPacket).toByteArray()
-                log.debug { "Sending player info to host: $inputPacket" }
+                // log.debug { "Sending player info to host: $inputPacket" }
                 networkManager.sendToHost(bytes)
             }
         }

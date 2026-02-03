@@ -8,9 +8,11 @@ import com.badlogic.gdx.math.Vector2
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
+import me.baldo3000.showdown.ecs.bullets
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
+import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.network.*
 import network.HostNetworkManager
@@ -28,8 +30,10 @@ class HostNetworkSystem(
     private val playerLastInputSequenceNumbers = mutableMapOf<Uuid, Int>()
 
     init {
+        DamageComponent.mapper
+        RemoveComponent.mapper
         Json.encodeToString(PlayerInputPacket(Uuid.random(), 0, 0))
-        Json.encodeToString(PlayerSnapshot(Uuid.random(), Vector2D(0f, 0f), Vector2D(0f, 0f), 100f))
+        Json.encodeToString(PlayerSnapshot(Uuid.random(), 100f, Vector2D(0f, 0f), Vector2D(0f, 0f)))
         Json.encodeToString(BulletSnapshot(Uuid.random(), null, 0f, Vector2D(0f, 0f), Vector2D(0f, 0f)))
         networkManager = HostNetworkManager(
             port,
@@ -71,7 +75,7 @@ class HostNetworkSystem(
 
     private fun broadcastWorldState() {
         // log.debug { "Sending broadcast update: $worldSnapshot" }
-        val worldSnapshot = WorldSnapshot.fromEntities(engine.entities.toList(), snapshotSequenceNumber++)
+        val worldSnapshot = WorldSnapshot.fromEntities(engine.players, engine.bullets, snapshotSequenceNumber++)
         val bytes = Json.encodeToString(worldSnapshot).toByteArray()
         networkManager.sendToClients(bytes)
     }

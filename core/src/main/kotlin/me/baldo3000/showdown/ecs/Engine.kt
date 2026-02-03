@@ -5,20 +5,38 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
-import ktx.ashley.get
+import ktx.ashley.allOf
+import ktx.ashley.exclude
 import me.baldo3000.showdown.UNIT_SCALE
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.network.Vector2D
 import kotlin.uuid.Uuid
 
+private val playersFamily =
+    allOf(
+        IdComponent::class,
+        HealthComponent::class,
+        TransformComponent::class,
+        MoveComponent::class,
+        ColliderComponent::class,
+        GraphicComponent::class
+    ).exclude(RemoveComponent::class).get()
+
+private val bulletsFamily =
+    allOf(
+        IdComponent::class,
+        DamageComponent::class,
+        TransformComponent::class,
+        MoveComponent::class,
+        ColliderComponent::class,
+        GraphicComponent::class
+    ).exclude(RemoveComponent::class).get()
+
 val Engine.players: List<Entity>
-    get() = entities.filter { entity ->
-        entity[IdComponent.mapper] != null &&
-            entity[HealthComponent.mapper] != null &&
-            entity[TransformComponent.mapper] != null &&
-            entity[MoveComponent.mapper] != null &&
-            entity[RemoveComponent.mapper] == null
-    }
+    get() = getEntitiesFor(playersFamily).toList()
+
+val Engine.bullets: List<Entity>
+    get() = getEntitiesFor(bulletsFamily).toList()
 
 fun Engine.createPlayer(
     playerId: Uuid,

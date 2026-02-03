@@ -15,9 +15,9 @@ data class Vector2D(
 @Serializable
 data class PlayerSnapshot(
     val id: Uuid,
+    val health: Float,
     val position: Vector2D,
-    val speed: Vector2D,
-    val health: Float
+    val speed: Vector2D
 ) {
     companion object {
         fun fromEntity(entity: Entity): PlayerSnapshot {
@@ -29,7 +29,7 @@ data class PlayerSnapshot(
                 ?: throw IllegalArgumentException("Entity must have a MoveComponent. Entity: $entity")
             val health = entity[HealthComponent.mapper]?.health
                 ?: throw IllegalArgumentException("Entity must have a HealthComponent. Entity: $entity")
-            return PlayerSnapshot(id, position, speed, health)
+            return PlayerSnapshot(id, health, position, speed)
         }
     }
 }
@@ -64,22 +64,11 @@ data class WorldSnapshot(
     val sequenceNumber: Int = 0
 ) {
     companion object {
-        fun fromEntities(entities: List<Entity>, sequenceNumber: Int): WorldSnapshot = WorldSnapshot(
-            sequenceNumber = sequenceNumber,
-            players = entities.filter {
-                it[RemoveComponent.mapper] == null &&
-                    it[IdComponent.mapper] != null &&
-                    it[HealthComponent.mapper] != null &&
-                    it[TransformComponent.mapper] != null &&
-                    it[MoveComponent.mapper] != null
-            }.map { PlayerSnapshot.fromEntity(it) },
-            bullets = entities.filter {
-                it[RemoveComponent.mapper] == null &&
-                    it[IdComponent.mapper] != null &&
-                    it[DamageComponent.mapper] != null &&
-                    it[TransformComponent.mapper] != null &&
-                    it[MoveComponent.mapper] != null
-            }.map { BulletSnapshot.fromEntity(it) }
-        )
+        fun fromEntities(players: List<Entity>, bullets: List<Entity>, sequenceNumber: Int): WorldSnapshot =
+            WorldSnapshot(
+                players.map { PlayerSnapshot.fromEntity(it) },
+                bullets.map { BulletSnapshot.fromEntity(it) },
+                sequenceNumber
+            )
     }
 }
