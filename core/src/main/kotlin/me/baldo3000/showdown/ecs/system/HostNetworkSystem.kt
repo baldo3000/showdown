@@ -30,11 +30,7 @@ class HostNetworkSystem(
     private val playerLastInputSequenceNumbers = mutableMapOf<Uuid, Int>()
 
     init {
-        DamageComponent.mapper
-        RemoveComponent.mapper
-        Json.encodeToString(PlayerInputPacket(Uuid.random(), 0, 0))
-        Json.encodeToString(PlayerSnapshot(Uuid.random(), 100f, Vector2D(0f, 0f), Vector2D(0f, 0f)))
-        Json.encodeToString(BulletSnapshot(Uuid.random(), null, 0f, Vector2D(0f, 0f), Vector2D(0f, 0f)))
+        loadSerializers()
         networkManager = HostNetworkManager(
             port,
             onPeerConnect = { peerId ->
@@ -121,6 +117,13 @@ class HostNetworkSystem(
                 log.error { "Discard input packet out of sequence" }
             }
         }
+    }
+
+    private fun loadSerializers() {
+        PlayerInputPacket.serializer()
+        PlayerSnapshot.serializer()
+        BulletSnapshot.serializer()
+        WorldSnapshot.serializer()
     }
 
     companion object {

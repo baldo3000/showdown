@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
 import ktx.log.logger
+import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.screen.GameScreen
@@ -37,6 +38,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
     }
 
     override fun create() {
+        loadComponentMappers()
         Gdx.app.logLevel = Application.LOG_DEBUG
         Gdx.input.inputProcessor = InputMultiplexer()
         log.debug { "Game instance created" }
@@ -49,6 +51,18 @@ class Showdown : KtxGame<ShowdownScreen>() {
         super.dispose()
         log.debug { "Max amount of sprites: ${(batch as SpriteBatch).maxSpritesInBatch}" }
         batch.dispose()
+    }
+
+    private fun loadComponentMappers() {
+        ColliderComponent.mapper
+        DamageComponent.mapper
+        GraphicComponent.mapper
+        HealthComponent.mapper
+        IdComponent.mapper
+        InputComponent.mapper
+        MoveComponent.mapper
+        RemoveComponent.mapper
+        TransformComponent.mapper
     }
 
     companion object {
