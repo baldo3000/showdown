@@ -27,9 +27,6 @@ fun Engine.createPlayer(
 ): Entity {
     val size = 64
     val pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888).apply {
-        //setColor(0f, 0f, 0f, 0f)
-        //fill()
-        // draw filled circle centered in pixmap
         setColor(Color.CYAN)
         fillCircle(size / 2, size / 2, size / 2 - 1)
 
@@ -65,9 +62,6 @@ fun Engine.createBullet(
 ): Entity {
     val size = 4
     val pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888).apply {
-        //setColor(0f, 0f, 0f, 0f)
-        //fill()
-        // draw filled circle centered in pixmap
         setColor(Color.RED)
         fillCircle(size / 2, size / 2, size / 2 - 1)
     }
