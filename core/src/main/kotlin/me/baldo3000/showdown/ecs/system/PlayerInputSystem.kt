@@ -3,7 +3,6 @@ package me.baldo3000.showdown.ecs.system
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.Viewport
@@ -13,6 +12,7 @@ import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.input.DummyInputProcessor
+import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.network.Vector2D
 import kotlin.uuid.Uuid
 
@@ -25,9 +25,9 @@ class PlayerInputSystem(
     private val family = allOf(InputComponent::class, TransformComponent::class, MoveComponent::class).get()
     private val entities
         get() = engine.getEntitiesFor(family)
+
     private val tmpSpeedVector = Vector2()
     private val tmpShootVector = Vector2()
-
     private var horizontal = 0
     private var vertical = 0
 
@@ -36,12 +36,12 @@ class PlayerInputSystem(
     }
 
     override fun addedToEngine(engine: Engine) {
-        Gdx.input.inputProcessor = this
+        addInputProcessor(this)
         super.addedToEngine(engine)
     }
 
     override fun removedFromEngine(engine: Engine) {
-        Gdx.input.inputProcessor = null
+        addInputProcessor(this)
         super.removedFromEngine(engine)
     }
 

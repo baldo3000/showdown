@@ -17,6 +17,9 @@ import me.baldo3000.showdown.ecs.component.TransformComponent
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.event.GameEventHandler
+import me.baldo3000.showdown.input.DummyInputProcessor
+import me.baldo3000.showdown.input.addInputProcessor
+import me.baldo3000.showdown.input.removeInputProcessor
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.Vector2D
 import me.baldo3000.showdown.network.WorldSnapshot
@@ -28,7 +31,7 @@ private const val UPDATE_RATE = 1 / 30f
 class ClientNetworkSystem(
     private val gameViewport: Viewport,
     private val eventHandler: GameEventHandler
-) : IntervalSystem(UPDATE_RATE) {
+) : IntervalSystem(UPDATE_RATE), DummyInputProcessor {
     private val networkManager: ClientNetworkManager
     private val idMap = mutableMapOf<Uuid, Entity>()
     private var inputSequenceNumber = 0
@@ -36,48 +39,30 @@ class ClientNetworkSystem(
     private var connected = false
     private var playerEntity: Entity? = null
 
+    private var tmpShootVector: Vector2? = null
+    private var horizontal = 0
+    private var vertical = 0
+
     init {
         networkManager = ClientNetworkManager(onConnect = {
             Gdx.app.postRunnable { connected = true }
         })
     }
 
-    override fun addedToEngine(engine: Engine?) {
+    override fun addedToEngine(engine: Engine) {
+        addInputProcessor(this)
         super.addedToEngine(engine)
         networkManager.connect("127.0.0.1", 8080)
     }
 
-    override fun removedFromEngine(engine: Engine?) {
+    override fun removedFromEngine(engine: Engine) {
+        removeInputProcessor(this)
         super.removedFromEngine(engine)
         networkManager.stop()
     }
 
     override fun updateInterval() {
         processIncomingMessages()
-        sendPlayerInputPacket()
-    }
-
-    private fun sendPlayerInputPacket() {
-        networkManager.id?.let { id ->
-            playerEntity?.let {
-                val top = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)
-                val left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)
-                val bottom = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)
-                val right = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)
-
-                val horizontal = (if (right) 1 else 0) - (if (left) 1 else 0)
-                val vertical = (if (top) 1 else 0) - (if (bottom) 1 else 0)
-                val touching = if (Gdx.input.isTouched) {
-                    val tmpVector = Vector2(Gdx.input.x.toFloat(), Gdx.input.y.toFloat())
-                    gameViewport.unproject(tmpVector)
-                    Vector2D(tmpVector.x, tmpVector.y)
-                } else null
-                val inputPacket = PlayerInputPacket(id, horizontal, vertical, touching, inputSequenceNumber++)
-                val bytes = Json.encodeToString(inputPacket).toByteArray()
-                // log.debug { "Sending player info to host: $inputPacket" }
-                networkManager.sendToHost(bytes)
-            }
-        }
     }
 
     private fun processIncomingMessages() {
@@ -144,6 +129,58 @@ class ClientNetworkSystem(
         } else {
             log.error { "Discard input packet out of sequence" }
         }
+    }
+
+    private fun sendPlayerInput() {
+        networkManager.id?.let { id ->
+            playerEntity?.let {
+                val inputPacket = PlayerInputPacket(
+                    id,
+                    horizontal,
+                    vertical,
+                    tmpShootVector?.let { Vector2D(it.x, it.y) },
+                    inputSequenceNumber++
+                )
+                val bytes = Json.encodeToString(inputPacket).toByteArray()
+                log.debug { "Sending player info to host: $inputPacket" }
+                networkManager.sendToHost(bytes)
+            }
+        }
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        when (keycode) {
+            Input.Keys.W, Input.Keys.UP -> vertical += 1
+            Input.Keys.S, Input.Keys.DOWN -> vertical -= 1
+            Input.Keys.A, Input.Keys.LEFT -> horizontal -= 1
+            Input.Keys.D, Input.Keys.RIGHT -> horizontal += 1
+        }
+        sendPlayerInput()
+        return super.keyDown(keycode)
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        when (keycode) {
+            Input.Keys.W, Input.Keys.UP -> vertical -= 1
+            Input.Keys.S, Input.Keys.DOWN -> vertical += 1
+            Input.Keys.A, Input.Keys.LEFT -> horizontal += 1
+            Input.Keys.D, Input.Keys.RIGHT -> horizontal -= 1
+        }
+        sendPlayerInput()
+        return super.keyUp(keycode)
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        tmpShootVector = Vector2(screenX.toFloat(), screenY.toFloat())
+        gameViewport.unproject(tmpShootVector)
+        sendPlayerInput()
+        return super.touchDown(screenX, screenY, pointer, button)
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        tmpShootVector = null
+        sendPlayerInput()
+        return super.touchUp(screenX, screenY, pointer, button)
     }
 
     companion object {
