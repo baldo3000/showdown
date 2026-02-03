@@ -1,7 +1,8 @@
 package me.baldo3000.showdown.ecs.system
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.math.Vector2
@@ -11,22 +12,48 @@ import ktx.ashley.get
 import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
+import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.network.Vector2D
 import kotlin.uuid.Uuid
 
 const val PLAYER_SPEED = 3f
-private const val TOUCH_TOLERANCE_DISTANCE = 0.1f
 
 class PlayerInputSystem(
     private val gameViewport: Viewport
-) : IteratingSystem(
-    allOf(InputComponent::class, TransformComponent::class, MoveComponent::class).get()
-) {
-    private val tmpVector = Vector2()
+) : EntitySystem(), DummyInputProcessor {
 
-    override fun processEntity(entity: Entity, deltaTime: Float) {
-        val health = entity[HealthComponent.mapper]
-        require(health != null) { "Entity must have a HealthComponent. Entity: $entity" }
+    private val family = allOf(InputComponent::class, TransformComponent::class, MoveComponent::class).get()
+    private val entities
+        get() = engine.getEntitiesFor(family)
+    private val tmpSpeedVector = Vector2()
+    private val tmpShootVector = Vector2()
+
+    private var horizontal = 0
+    private var vertical = 0
+
+    init {
+        setProcessing(false)
+    }
+
+    override fun addedToEngine(engine: Engine) {
+        Gdx.input.inputProcessor = this
+        super.addedToEngine(engine)
+    }
+
+    override fun removedFromEngine(engine: Engine) {
+        Gdx.input.inputProcessor = null
+        super.removedFromEngine(engine)
+    }
+
+    private fun updateEntitySpeeds() {
+        entities.forEach(::updateEntitySpeed)
+    }
+
+    private fun shootFromEntities() {
+        entities.forEach(::shootFromEntity)
+    }
+
+    private fun updateEntitySpeed(entity: Entity) {
         val transform = entity[TransformComponent.mapper]
         require(transform != null) { "Entity must have a TransformComponent. Entity: $entity" }
         val input = entity[InputComponent.mapper]
@@ -34,36 +61,61 @@ class PlayerInputSystem(
         val move = entity[MoveComponent.mapper]
         require(move != null) { "Entity must have a MoveComponent. Entity: $entity" }
 
-        val top = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)
-        val left = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)
-        val bottom = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)
-        val right = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)
+        tmpSpeedVector.set(horizontal.toFloat(), vertical.toFloat()).nor()
 
-        val horizontal = (if (right) 1 else 0) - (if (left) 1 else 0)
-        val vertical = (if (top) 1 else 0) - (if (bottom) 1 else 0)
+        move.speed.x = PLAYER_SPEED * tmpSpeedVector.x
+        move.speed.y = PLAYER_SPEED * tmpSpeedVector.y
+    }
 
-        tmpVector.set(horizontal.toFloat(), vertical.toFloat()).nor()
+    private fun shootFromEntity(entity: Entity) {
+        val transform = entity[TransformComponent.mapper]
+        require(transform != null) { "Entity must have a TransformComponent. Entity: $entity" }
+        val input = entity[InputComponent.mapper]
+        require(input != null) { "Entity must have a InputComponent. Entity: $entity" }
+        val move = entity[MoveComponent.mapper]
+        require(move != null) { "Entity must have a MoveComponent. Entity: $entity" }
 
-        move.speed.x = PLAYER_SPEED * tmpVector.x
-        move.speed.y = PLAYER_SPEED * tmpVector.y
+        val distX = tmpShootVector.x - transform.position.x
+        val distY = tmpShootVector.y - transform.position.y
+        val speedVector = Vector2(distX, distY).nor()
 
-        if (Gdx.input.isTouched) {
-            tmpVector.x = Gdx.input.x.toFloat()
-            tmpVector.y = Gdx.input.y.toFloat()
-            gameViewport.unproject(tmpVector)
-            val distX = tmpVector.x - transform.position.x
-            val distY = tmpVector.y - transform.position.y
-            val speedVector = Vector2(distX, distY).nor()
+        val bullet = engine.createBullet(
+            Uuid.random(),
+            entity[IdComponent.mapper]?.id,
+            DEFAULT_DAMAGE,
+            Vector2D(transform.position.x, transform.position.y),
+            Vector2D(speedVector.x * 5f, speedVector.y * 5f)
+        )
+        engine.addEntity(bullet)
+    }
 
-            val bullet = engine.createBullet(
-                Uuid.random(),
-                entity[IdComponent.mapper]?.id,
-                DEFAULT_DAMAGE,
-                Vector2D(transform.position.x, transform.position.y),
-                Vector2D(speedVector.x * 5f, speedVector.y * 5f)
-            )
-            engine.addEntity(bullet)
+    override fun keyDown(keycode: Int): Boolean {
+        when (keycode) {
+            Input.Keys.W, Input.Keys.UP -> vertical += 1
+            Input.Keys.S, Input.Keys.DOWN -> vertical -= 1
+            Input.Keys.A, Input.Keys.LEFT -> horizontal -= 1
+            Input.Keys.D, Input.Keys.RIGHT -> horizontal += 1
         }
+        updateEntitySpeeds()
+        return super.keyDown(keycode)
+    }
+
+    override fun keyUp(keycode: Int): Boolean {
+        when (keycode) {
+            Input.Keys.W, Input.Keys.UP -> vertical -= 1
+            Input.Keys.S, Input.Keys.DOWN -> vertical += 1
+            Input.Keys.A, Input.Keys.LEFT -> horizontal += 1
+            Input.Keys.D, Input.Keys.RIGHT -> horizontal -= 1
+        }
+        updateEntitySpeeds()
+        return super.keyUp(keycode)
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        tmpShootVector.set(screenX.toFloat(), screenY.toFloat())
+        gameViewport.unproject(tmpShootVector)
+        shootFromEntities()
+        return super.touchDown(screenX, screenY, pointer, button)
     }
 
     companion object {
