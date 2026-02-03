@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.FitViewport
@@ -37,6 +38,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
 
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
+        Gdx.input.inputProcessor = InputMultiplexer()
         log.debug { "Game instance created" }
         addScreen(HomeScreen(this))
         addScreen(GameScreen(this))
