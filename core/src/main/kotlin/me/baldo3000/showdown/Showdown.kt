@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.app.KtxGame
 import ktx.log.logger
@@ -21,7 +22,7 @@ const val UNIT_SCALE = 1 / 16f
 
 /** [com.badlogic.gdx.ApplicationListener] implementation shared by all platforms. */
 class Showdown : KtxGame<ShowdownScreen>() {
-    val gameViewport = FitViewport(16f, 9f)
+    val gameViewport = ExtendViewport(16f, 9f)
     val batch: Batch by lazy { SpriteBatch() }
     val eventHandler by lazy { GameEventHandler() }
     val engine: Engine by lazy {
