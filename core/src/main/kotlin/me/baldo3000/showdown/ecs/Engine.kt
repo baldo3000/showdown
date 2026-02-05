@@ -52,7 +52,10 @@ fun Engine.createPlayer(
     val redTexture = Texture(pixmap)
     pixmap.dispose()
     return createEntity().apply {
-        if (controllable) add(InputComponent())
+        if (controllable) {
+            add(InputComponent())
+            add(CameraComponent())
+        }
         add(IdComponent().apply { id = playerId })
         add(TransformComponent().apply {
             this.position.x = position.x

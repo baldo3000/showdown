@@ -30,6 +30,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
             addSystem(EventSystem(eventHandler))
             addSystem(MoveSystem(eventHandler))
             addSystem(CollisionSystem())
+            addSystem(CameraSystem(gameViewport))
             addSystem(RenderSystem(batch, gameViewport))
             addSystem(RemoveSystem())
             addSystem(HostNetworkSystem(8080, eventHandler))
@@ -54,6 +55,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
     }
 
     private fun loadComponentMappers() {
+        CameraComponent.mapper
         ColliderComponent.mapper
         DamageComponent.mapper
         GraphicComponent.mapper
