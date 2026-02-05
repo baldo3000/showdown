@@ -26,6 +26,11 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         engine.update(min(delta, MAX_DELTA_TIME))
     }
 
+    override fun dispose() {
+        log.debug { "GameScreen has been disposed" }
+        super.dispose()
+    }
+
     companion object {
         private val log = logger<GameScreen>()
     }
