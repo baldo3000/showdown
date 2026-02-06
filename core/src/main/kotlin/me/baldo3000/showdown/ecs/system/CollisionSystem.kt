@@ -10,20 +10,25 @@ import ktx.ashley.allOf
 import ktx.ashley.exclude
 import ktx.ashley.get
 import ktx.log.logger
+import ktx.math.minusAssign
+import ktx.math.times
 import me.baldo3000.showdown.ecs.component.*
+
+private const val UPDATE_RATE = 1 / 60f
 
 class CollisionSystem :
     IteratingSystem(
         allOf(TransformComponent::class, MoveComponent::class, ColliderComponent::class)
             .exclude(RemoveComponent::class).get()
     ) {
-
-    val entityCache: MutableSet<Entity> = mutableSetOf()
+    private var accumulator = 0f
 
     override fun update(deltaTime: Float) {
-        entityCache.clear()
-        entityCache.addAll(entities)
-        super.update(deltaTime)
+        accumulator += deltaTime
+        while (accumulator >= UPDATE_RATE) {
+            accumulator -= UPDATE_RATE
+            super.update(UPDATE_RATE)
+        }
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
@@ -33,29 +38,31 @@ class CollisionSystem :
         require(move != null) { "Entity must have a MoveComponent. Entity: $entity" }
         val collider = entity[ColliderComponent.mapper]
         require(collider != null) { "Entity must have a ColliderComponent. Entity: $entity" }
-        val health = entity[HealthComponent.mapper]
-        val id = entity[IdComponent.mapper]
+        val damage = entity[DamageComponent.mapper]
 
-        val iterator = entityCache.iterator()
-        while (iterator.hasNext()) {
-            val other = iterator.next()
+        for (other in engine.getEntitiesFor(othersFamily)) {
             if (other != entity) {
-                val otherTransform = other[TransformComponent.mapper]
-                require(otherTransform != null) { "Entity must have a TransformComponent. Entity: $other" }
-                val otherMove = other[MoveComponent.mapper]
-                require(otherMove != null) { "Entity must have a MoveComponent. Entity: $other" }
                 val otherCollider = other[ColliderComponent.mapper]
                 require(otherCollider != null) { "Entity must have a ColliderComponent. Entity: $other" }
-                val otherDamage = other[DamageComponent.mapper]
 
-                if (id?.id != otherDamage?.sourceId && health != null && otherDamage != null
-                    && collider.collider.overlaps(otherCollider.collider)
-                ) {
-                    health.health -= otherDamage.damage
-                    other.add(RemoveComponent())
-                    iterator.remove()
-                    if (health.health <= 0f) {
+                if (collider.collider.overlaps(otherCollider.collider)) {
+                    val otherId = other[IdComponent.mapper]
+                    val otherHealth = other[HealthComponent.mapper]
+                    val otherDamage = other[DamageComponent.mapper]
+
+                    // Entity is player and other is not a bullet
+                    if (damage == null && otherDamage == null) {
+                        transform.position.minusAssign(move.speed * deltaTime)
+                        collider.collider.setCenter(transform.position.x, transform.position.y)
+                    }
+                    // Entity is a bullet
+                    else if (damage != null && damage.sourceId != otherId?.id) {
                         entity.add(RemoveComponent())
+
+                        otherHealth?.apply {
+                            health -= damage.damage
+                            if (health <= 0f) other.add(RemoveComponent())
+                        }
                     }
                 }
             }
@@ -64,6 +71,8 @@ class CollisionSystem :
 
     companion object {
         private val log = logger<CollisionSystem>()
+        private val othersFamily = allOf(TransformComponent::class, ColliderComponent::class)
+            .exclude(RemoveComponent::class).get()
     }
 }
 
