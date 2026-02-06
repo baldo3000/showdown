@@ -3,6 +3,7 @@ package me.baldo3000.showdown.ecs
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.math.Circle
+import com.badlogic.gdx.math.Rectangle
 import ktx.ashley.allOf
 import ktx.ashley.entity
 import ktx.ashley.exclude
@@ -120,10 +121,9 @@ fun Engine.createWall(position: Vector2D, size: Vector2D): Entity {
                 setOriginCenter()
             }
         }
-        /*add(ColliderComponent().apply {
-            val radius = max(size.x, size.y) / 2f
-            collider.set(position.x, position.y, radius)
-        })*/
+        with<ColliderComponent> {
+            collider = Rectangle(position.x - size.x / 2f, position.y - size.y / 2f, size.x, size.y)
+        }
     }
 }
 
