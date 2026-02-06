@@ -2,6 +2,7 @@ package me.baldo3000.showdown.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.gdx.math.MathUtils
 import ktx.ashley.allOf
 import ktx.ashley.exclude
 import ktx.ashley.get
@@ -22,7 +23,27 @@ class MoveSystem(private val eventHandler: GameEventHandler) :
         accumulator += deltaTime
         while (accumulator >= UPDATE_RATE) {
             accumulator -= UPDATE_RATE
+
+            // Update previous position
+            entities.forEach { entity ->
+                entity[TransformComponent.mapper]?.let { transform ->
+                    transform.previousPosition.set(transform.position)
+                }
+            }
+
             super.update(UPDATE_RATE)
+        }
+
+        val alpha = accumulator / UPDATE_RATE
+        // Update interpolation position
+        entities.forEach { entity ->
+            entity[TransformComponent.mapper]?.let { transform ->
+                transform.interpolatedPosition.set(
+                    MathUtils.lerp(transform.previousPosition.x, transform.position.x, alpha),
+                    MathUtils.lerp(transform.previousPosition.y, transform.position.y, alpha),
+                    transform.position.z
+                )
+            }
         }
     }
 

@@ -56,9 +56,7 @@ fun Engine.createPlayer(
         }
         with<IdComponent> { id = playerId }
         with<TransformComponent> {
-            this.position.x = position.x
-            this.position.y = position.y
-            this.position.z = 0f
+            this.setInitialPosition(position.x, position.y, 0f)
             this.size.x = PLAYER_SIZE
             this.size.y = PLAYER_SIZE
         }
@@ -85,9 +83,7 @@ fun Engine.createBullet(
     return entity {
         with<IdComponent> { id = bulletId }
         with<TransformComponent> {
-            this.position.x = position.x
-            this.position.y = position.y
-            this.position.z = -1f
+            this.setInitialPosition(position.x, position.y, -1f)
             this.size.x = BULLET_SIZE
             this.size.y = BULLET_SIZE
         }
@@ -113,9 +109,7 @@ fun Engine.createBullet(
 fun Engine.createWall(position: Vector2D, size: Vector2D): Entity {
     return entity {
         with<TransformComponent> {
-            this.position.x = position.x
-            this.position.y = position.y
-            this.position.z = 0f
+            this.setInitialPosition(position.x, position.y, 0f)
             this.size.x = size.x
             this.size.y = size.y
         }

@@ -19,7 +19,7 @@ class CameraSystem(private val gameViewport: Viewport) : IteratingSystem(
         require(transform != null) { "Entity must have a TransformComponent. Entity: $entity" }
         val camera = entity[CameraComponent.mapper]
         require(camera != null) { "Entity must have a CameraComponent. Entity: $entity" }
-        gameViewport.camera.position.set(transform.position.x, transform.position.y, 1f)
+        gameViewport.camera.position.set(transform.interpolatedPosition.x, transform.interpolatedPosition.y, 1f)
         gameViewport.camera.update()
     }
 
