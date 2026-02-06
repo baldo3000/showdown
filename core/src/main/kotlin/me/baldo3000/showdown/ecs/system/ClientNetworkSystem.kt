@@ -96,8 +96,10 @@ class ClientNetworkSystem(
                     if (networkManager.id == snapshot.id) playerEntity = newPlayer
                     newPlayer
                 }
-                // log.debug { "Updating entity with id ${snapshot.id}" }
-                entity[TransformComponent.mapper]?.position?.set(snapshot.position.x, snapshot.position.y, 0f)
+                // log.debug { "Updating player with id ${snapshot.id}" }
+                entity[TransformComponent.mapper]?.position?.let {
+                    it.set(snapshot.position.x, snapshot.position.y, it.z)
+                }
                 entity[MoveComponent.mapper]?.speed?.set(snapshot.speed.x, snapshot.speed.y)
                 entity[HealthComponent.mapper]?.health = snapshot.health
             }
@@ -113,8 +115,10 @@ class ClientNetworkSystem(
                     )
                     newBullet
                 }
-                // log.debug { "Updating entity with id ${snapshot.id}" }
-                entity[TransformComponent.mapper]?.position?.set(snapshot.position.x, snapshot.position.y, 0f)
+                // log.debug { "Updating bullet with id ${snapshot.id}" }
+                entity[TransformComponent.mapper]?.position?.let {
+                    it.set(snapshot.position.x, snapshot.position.y, it.z)
+                }
                 entity[MoveComponent.mapper]?.speed?.set(snapshot.speed.x, snapshot.speed.y)
             }
         } else {
