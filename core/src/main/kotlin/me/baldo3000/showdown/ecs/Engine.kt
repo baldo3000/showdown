@@ -2,9 +2,6 @@ package me.baldo3000.showdown.ecs
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
 import ktx.ashley.allOf
 import ktx.ashley.entity
 import ktx.ashley.exclude
@@ -12,9 +9,8 @@ import ktx.ashley.with
 import me.baldo3000.showdown.UNIT_SCALE
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.network.Vector2D
+import me.baldo3000.showdown.ui.Textures
 import me.baldo3000.showdown.world.ShowdownWorld
-import kotlin.math.max
-import kotlin.math.roundToInt
 import kotlin.uuid.Uuid
 
 private val playersFamily =
@@ -48,14 +44,6 @@ fun Engine.createPlayer(
     position: Vector2D = Vector2D(8f, 4.5f),
     controllable: Boolean = false
 ): Entity {
-    val size = 64
-    val pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888).apply {
-        setColor(Color.CYAN)
-        fillCircle(size / 2, size / 2, size / 2 - 1)
-    }
-    val redTexture = Texture(pixmap)
-    pixmap.dispose()
-
     return entity {
         if (controllable) {
             with<InputComponent>()
@@ -73,7 +61,7 @@ fun Engine.createPlayer(
         with<HealthComponent>()
         with<GraphicComponent> {
             sprite.run {
-                setRegion(redTexture)
+                setRegion(Textures.playerTexture)
                 setSize(texture.width * UNIT_SCALE, texture.height * UNIT_SCALE)
                 setOriginCenter()
             }
@@ -88,14 +76,6 @@ fun Engine.createBullet(
     position: Vector2D,
     speed: Vector2D
 ): Entity {
-    val size = 4
-    val pixmap = Pixmap(size, size, Pixmap.Format.RGBA8888).apply {
-        setColor(Color.RED)
-        fillCircle(size / 2, size / 2, size / 2 - 1)
-    }
-    val redTexture = Texture(pixmap)
-    pixmap.dispose()
-
     return entity {
         with<IdComponent> { id = bulletId }
         with<TransformComponent> {
@@ -112,7 +92,7 @@ fun Engine.createBullet(
         }
         with<GraphicComponent> {
             sprite.run {
-                setRegion(redTexture)
+                setRegion(Textures.bulletTexture)
                 setSize(texture.width * UNIT_SCALE, texture.height * UNIT_SCALE)
                 setOriginCenter()
             }
@@ -125,15 +105,6 @@ fun Engine.createBullet(
 }
 
 fun Engine.createWall(position: Vector2D, size: Vector2D): Entity {
-    val pxW = max(1, (size.x / UNIT_SCALE).roundToInt())
-    val pxH = max(1, (size.y / UNIT_SCALE).roundToInt())
-    val pixmap = Pixmap(pxW, pxH, Pixmap.Format.RGBA8888).apply {
-        setColor(Color.RED)
-        fillRectangle(0, 0, pxW, pxH)
-    }
-    val texture = Texture(pixmap)
-    pixmap.dispose()
-
     return entity {
         with<TransformComponent> {
             this.position.x = position.x
@@ -143,7 +114,7 @@ fun Engine.createWall(position: Vector2D, size: Vector2D): Entity {
         }
         with<GraphicComponent> {
             sprite.run {
-                setRegion(texture)
+                setRegion(Textures.wallTexture)
                 setSize(texture.width * UNIT_SCALE, texture.height * UNIT_SCALE)
                 setOriginCenter()
             }
