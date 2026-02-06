@@ -1,17 +1,17 @@
 [versions]
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 gdx = "1.14.0"
 ashley = "1.7.4"
 ktx = "1.13.1-rc1"
-coroutines = "1.8.1"
+coroutines = "1.10.2"
 graalHelper = "2.0.1"
 construo = "2.1.0"
-graalBuildTools = "0.9.28"
+graalBuildTools = "0.11.4"
 foojay = "1.0.0"
-ktor = "3.3.3"
+ktor = "3.4.0"
 kotlinLoggingJvm = "7.0.14"
 kotlinSerializationJson = "1.10.0"
-logbackClassic = "1.5.25"
+logbackClassic = "1.5.27"
 
 [libraries]
 # GDX Core
