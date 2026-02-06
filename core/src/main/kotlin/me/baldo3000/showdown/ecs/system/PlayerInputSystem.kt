@@ -77,14 +77,14 @@ class PlayerInputSystem(
 
         val distX = tmpShootVector.x - transform.position.x
         val distY = tmpShootVector.y - transform.position.y
-        val speedVector = Vector2(distX, distY).nor()
+        tmpSpeedVector.set(distX, distY).nor()
 
         engine.createBullet(
             Uuid.random(),
             entity[IdComponent.mapper]?.id,
             DEFAULT_DAMAGE,
             Vector2D(transform.position.x, transform.position.y),
-            Vector2D(speedVector.x * 5f, speedVector.y * 5f)
+            Vector2D(tmpSpeedVector.x * 5f, tmpSpeedVector.y * 5f)
         )
     }
 
