@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 
 object Textures {
-    private const val PLAYER_TEXTURE_SIZE = 64
+    private const val PLAYER_TEXTURE_SIZE = 256
     private const val BULLET_TEXTURE_SIZE = 4
     private const val WALL_TEXTURE_SIZE = 1
 
@@ -30,6 +30,8 @@ object Textures {
         playerTexture = Texture(playerPixmap)
         bulletTexture = Texture(bulletPixmap)
         wallTexture = Texture(wallPixmap)
+
+        playerTexture.anisotropicFilter = 2f
 
         playerPixmap.dispose()
         bulletPixmap.dispose()
