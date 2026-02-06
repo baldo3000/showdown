@@ -2,6 +2,7 @@ package me.baldo3000.showdown.ecs
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.Circle
 import ktx.ashley.allOf
 import ktx.ashley.entity
 import ktx.ashley.exclude
@@ -61,7 +62,7 @@ fun Engine.createPlayer(
             this.size.x = PLAYER_SIZE
             this.size.y = PLAYER_SIZE
         }
-        with<ColliderComponent> { collider.set(position.x, position.y, PLAYER_SIZE / 2) }
+        with<ColliderComponent> { collider = Circle(position.x, position.y, PLAYER_SIZE / 2) }
         with<MoveComponent>()
         with<HealthComponent>()
         with<GraphicComponent> {
@@ -90,7 +91,7 @@ fun Engine.createBullet(
             this.size.x = BULLET_SIZE
             this.size.y = BULLET_SIZE
         }
-        with<ColliderComponent> { collider.set(position.x, position.y, BULLET_SIZE / 2) }
+        with<ColliderComponent> { collider = Circle(position.x, position.y, BULLET_SIZE / 2) }
         with<MoveComponent> {
             this.speed.x = speed.x
             this.speed.y = speed.y

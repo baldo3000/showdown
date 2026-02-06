@@ -2,6 +2,10 @@ package me.baldo3000.showdown.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.gdx.math.Circle
+import com.badlogic.gdx.math.Intersector
+import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Shape2D
 import ktx.ashley.allOf
 import ktx.ashley.exclude
 import ktx.ashley.get
@@ -60,5 +64,37 @@ class CollisionSystem :
 
     companion object {
         private val log = logger<CollisionSystem>()
+    }
+}
+
+fun Shape2D.setCenter(x: Float, y: Float) {
+    when (this) {
+        is Circle -> {
+            this.setPosition(x, y)
+        }
+
+        is Rectangle -> {
+            this.setCenter(x, y)
+        }
+
+        else -> throw UnsupportedOperationException("Unsupported shape type: ${this::class}")
+    }
+}
+
+fun Shape2D.overlaps(other: Shape2D): Boolean {
+    return when (this) {
+        is Circle -> when (other) {
+            is Circle -> this.overlaps(other)
+            is Rectangle -> Intersector.overlaps(this, other)
+            else -> throw UnsupportedOperationException("Unsupported shape type: ${other::class}")
+        }
+
+        is Rectangle -> when (other) {
+            is Circle -> Intersector.overlaps(other, this)
+            is Rectangle -> this.overlaps(other)
+            else -> throw UnsupportedOperationException("Unsupported shape type: ${other::class}")
+        }
+
+        else -> throw UnsupportedOperationException("Unsupported shape type: ${this::class}")
     }
 }

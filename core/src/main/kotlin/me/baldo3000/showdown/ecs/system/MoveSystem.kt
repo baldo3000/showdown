@@ -50,8 +50,7 @@ class MoveSystem(private val eventHandler: GameEventHandler) :
         transform.position.y += deltaY
 
         if (collider != null) {
-            collider.collider.x += deltaX
-            collider.collider.y += deltaY
+            collider.collider.setCenter(transform.position.x, transform.position.y)
         }
     }
 
