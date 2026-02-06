@@ -93,7 +93,7 @@ class ClientNetworkSystem(
                         Vector2D(snapshot.position.x, snapshot.position.y),
                         snapshot.id == networkManager.id
                     )
-                    playerEntity = newPlayer
+                    if (networkManager.id == snapshot.id) playerEntity = newPlayer
                     newPlayer
                 }
                 // log.debug { "Updating entity with id ${snapshot.id}" }
