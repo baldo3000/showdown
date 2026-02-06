@@ -13,6 +13,10 @@ import me.baldo3000.showdown.ui.Textures
 import me.baldo3000.showdown.world.ShowdownWorld
 import kotlin.uuid.Uuid
 
+const val PLAYER_SIZE = 1f
+const val BULLET_SIZE = 0.25f
+const val WALL_THICKNESS = 0.5f
+
 private val playersFamily =
     allOf(
         IdComponent::class,
@@ -53,10 +57,11 @@ fun Engine.createPlayer(
         with<TransformComponent> {
             this.position.x = position.x
             this.position.y = position.y
-            this.size.x = 1f
-            this.size.y = 1f
+            this.position.z = 0f
+            this.size.x = PLAYER_SIZE
+            this.size.y = PLAYER_SIZE
         }
-        with<ColliderComponent> { collider.set(position.x, position.y, 1f / 2) }
+        with<ColliderComponent> { collider.set(position.x, position.y, PLAYER_SIZE / 2) }
         with<MoveComponent>()
         with<HealthComponent>()
         with<GraphicComponent> {
@@ -82,10 +87,10 @@ fun Engine.createBullet(
             this.position.x = position.x
             this.position.y = position.y
             this.position.z = -1f
-            this.size.x = 0.25f
-            this.size.y = 0.25f
+            this.size.x = BULLET_SIZE
+            this.size.y = BULLET_SIZE
         }
-        with<ColliderComponent> { collider.set(position.x, position.y, 0.25f / 2) }
+        with<ColliderComponent> { collider.set(position.x, position.y, BULLET_SIZE / 2) }
         with<MoveComponent> {
             this.speed.x = speed.x
             this.speed.y = speed.y
@@ -109,6 +114,7 @@ fun Engine.createWall(position: Vector2D, size: Vector2D): Entity {
         with<TransformComponent> {
             this.position.x = position.x
             this.position.y = position.y
+            this.position.z = 0f
             this.size.x = size.x
             this.size.y = size.y
         }
@@ -127,33 +133,31 @@ fun Engine.createWall(position: Vector2D, size: Vector2D): Entity {
 }
 
 fun Engine.initializeWorld(world: ShowdownWorld) {
-    val thickness = 0.5f
-
-    val w = world.mapSize.x
-    val h = world.mapSize.y
+    val width = world.mapSize.x
+    val height = world.mapSize.y
 
     // Left wall
     createWall(
-        position = Vector2D(-thickness / 2f, h / 2f),
-        size = Vector2D(thickness, h)
+        position = Vector2D(-WALL_THICKNESS / 2f, height / 2f),
+        size = Vector2D(WALL_THICKNESS, height)
     )
 
     // Right wall
     createWall(
-        position = Vector2D(w + thickness / 2f, h / 2f),
-        size = Vector2D(thickness, h)
+        position = Vector2D(width + WALL_THICKNESS / 2f, height / 2f),
+        size = Vector2D(WALL_THICKNESS, height)
     )
 
     // Bottom wall
     createWall(
-        position = Vector2D(w / 2f, -thickness / 2f),
-        size = Vector2D(w + 2f * thickness, thickness)
+        position = Vector2D(width / 2f, -WALL_THICKNESS / 2f),
+        size = Vector2D(width + 2f * WALL_THICKNESS, WALL_THICKNESS)
     )
 
     // Top wall
     createWall(
-        position = Vector2D(w / 2f, h + thickness / 2f),
-        size = Vector2D(w + 2f * thickness, thickness)
+        position = Vector2D(width / 2f, height + WALL_THICKNESS / 2f),
+        size = Vector2D(width + 2f * WALL_THICKNESS, WALL_THICKNESS)
     )
 }
 

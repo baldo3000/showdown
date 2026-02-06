@@ -35,4 +35,10 @@ object Textures {
         bulletPixmap.dispose()
         wallPixmap.dispose()
     }
+
+    fun dispose() {
+        playerTexture.dispose()
+        bulletTexture.dispose()
+        wallTexture.dispose()
+    }
 }

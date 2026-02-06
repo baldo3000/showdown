@@ -16,6 +16,7 @@ import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.screen.GameScreen
 import me.baldo3000.showdown.screen.HomeScreen
 import me.baldo3000.showdown.screen.ShowdownScreen
+import me.baldo3000.showdown.ui.Textures
 
 const val UNIT_SCALE = 1 / 16f
 
@@ -52,6 +53,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
         super.dispose()
         log.debug { "Max amount of sprites: ${(batch as SpriteBatch).maxSpritesInBatch}" }
         batch.dispose()
+        Textures.dispose()
     }
 
     private fun loadComponentMappers() {
