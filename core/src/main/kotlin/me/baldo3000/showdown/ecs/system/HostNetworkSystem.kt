@@ -8,13 +8,11 @@ import com.badlogic.gdx.math.Vector2
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
-import me.baldo3000.showdown.ecs.bullets
+import me.baldo3000.showdown.ecs.*
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.createBullet
-import me.baldo3000.showdown.ecs.createPlayer
-import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.network.*
+import me.baldo3000.showdown.world.ShowdownWorld
 import network.HostNetworkManager
 import kotlin.uuid.Uuid
 
@@ -38,7 +36,6 @@ class HostNetworkSystem(
                     val player = engine.createPlayer(peerId, controllable = false)
                     playerEntities[peerId] = player
                     playerLastInputSequenceNumbers[peerId] = -1
-                    engine.addEntity(player)
                 }
             },
             onPeerDisconnect = { peerId ->
@@ -54,8 +51,8 @@ class HostNetworkSystem(
 
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
-        val player = engine.createPlayer(Uuid.random(), controllable = true)
-        engine.addEntity(player)
+        engine.createPlayer(Uuid.random(), controllable = true)
+        engine.initializeWorld(ShowdownWorld())
         networkManager.start()
     }
 
@@ -101,14 +98,12 @@ class HostNetworkSystem(
                             val distX = playerInput.touching.x - transform.position.x
                             val distY = playerInput.touching.y - transform.position.y
                             val bulletSpeedVector = Vector2(distX, distY).nor()
-                            engine.addEntity(
-                                engine.createBullet(
-                                    Uuid.random(),
-                                    id.id,
-                                    DEFAULT_DAMAGE,
-                                    Vector2D(transform.position.x, transform.position.y),
-                                    Vector2D(bulletSpeedVector.x * 5f, bulletSpeedVector.y * 5f)
-                                )
+                            engine.createBullet(
+                                Uuid.random(),
+                                id.id,
+                                DEFAULT_DAMAGE,
+                                Vector2D(transform.position.x, transform.position.y),
+                                Vector2D(bulletSpeedVector.x * 5f, bulletSpeedVector.y * 5f)
                             )
                         }
                     }

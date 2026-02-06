@@ -94,7 +94,6 @@ class ClientNetworkSystem(
                         snapshot.id == networkManager.id
                     )
                     playerEntity = newPlayer
-                    engine.addEntity(newPlayer)
                     newPlayer
                 }
                 // log.debug { "Updating entity with id ${snapshot.id}" }
@@ -105,16 +104,14 @@ class ClientNetworkSystem(
 
             state.bullets.forEach { snapshot ->
                 val entity = idMap.getOrPut(snapshot.id) {
-                    val newPlayer = engine.createBullet(
+                    val newBullet = engine.createBullet(
                         snapshot.id,
                         snapshot.sourceId,
                         snapshot.damage,
                         Vector2D(snapshot.position.x, snapshot.position.y),
                         Vector2D(snapshot.speed.x, snapshot.speed.y)
                     )
-                    playerEntity = newPlayer
-                    engine.addEntity(newPlayer)
-                    newPlayer
+                    newBullet
                 }
                 // log.debug { "Updating entity with id ${snapshot.id}" }
                 entity[TransformComponent.mapper]?.position?.set(snapshot.position.x, snapshot.position.y, 0f)

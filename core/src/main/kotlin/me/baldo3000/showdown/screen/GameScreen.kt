@@ -15,10 +15,10 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     override fun show() {
         log.debug { "GameScreen is shown" }
         if (testShooting) {
-            engine.addEntity(engine.createPlayer(Uuid.random(), Vector2D(3f, 3f)))
-            engine.addEntity(engine.createPlayer(Uuid.random(), Vector2D(14f, 8f)))
-            engine.addEntity(engine.createPlayer(Uuid.random(), Vector2D(14f, 3f)))
-            engine.addEntity(engine.createPlayer(Uuid.random(), Vector2D(3f, 8f)))
+            engine.createPlayer(Uuid.random(), Vector2D(3f, 3f))
+            engine.createPlayer(Uuid.random(), Vector2D(14f, 8f))
+            engine.createPlayer(Uuid.random(), Vector2D(14f, 3f))
+            engine.createPlayer(Uuid.random(), Vector2D(3f, 8f))
         }
     }
 
