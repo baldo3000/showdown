@@ -58,16 +58,44 @@ data class BulletSnapshot(
 }
 
 @Serializable
+data class WallSnapshot(
+    val id: Uuid,
+    val position: Vector2D,
+    val size: Vector2D
+) {
+    companion object {
+        fun fromEntity(entity: Entity): WallSnapshot {
+            val id = entity[IdComponent.mapper]?.id
+                ?: throw IllegalArgumentException("Entity must have an IdComponent. Entity: $entity")
+            val position = entity[TransformComponent.mapper]
+                ?: throw IllegalArgumentException("Entity must have a TransformComponent. Entity: $entity")
+            return WallSnapshot(
+                id,
+                position.position.let { Vector2D(it.x, it.y) },
+                position.size.let { Vector2D(it.x, it.y) })
+        }
+    }
+}
+
+
+@Serializable
 data class WorldSnapshot(
     val players: List<PlayerSnapshot>,
     val bullets: List<BulletSnapshot>,
+    val walls: List<WallSnapshot>,
     val sequenceNumber: Int = 0
 ) {
     companion object {
-        fun fromEntities(players: List<Entity>, bullets: List<Entity>, sequenceNumber: Int): WorldSnapshot =
+        fun fromEntities(
+            players: List<Entity>,
+            bullets: List<Entity>,
+            walls: List<Entity>,
+            sequenceNumber: Int
+        ): WorldSnapshot =
             WorldSnapshot(
                 players.map { PlayerSnapshot.fromEntity(it) },
                 bullets.map { BulletSnapshot.fromEntity(it) },
+                walls.map { WallSnapshot.fromEntity(it) },
                 sequenceNumber
             )
     }

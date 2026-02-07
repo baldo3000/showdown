@@ -68,7 +68,8 @@ class HostNetworkSystem(
 
     private fun broadcastWorldState() {
         // log.debug { "Sending broadcast update: $worldSnapshot" }
-        val worldSnapshot = WorldSnapshot.fromEntities(engine.players, engine.bullets, snapshotSequenceNumber++)
+        val worldSnapshot =
+            WorldSnapshot.fromEntities(engine.players, engine.bullets, engine.walls, snapshotSequenceNumber++)
         val bytes = Json.encodeToString(worldSnapshot).toByteArray()
         networkManager.sendToClients(bytes)
     }

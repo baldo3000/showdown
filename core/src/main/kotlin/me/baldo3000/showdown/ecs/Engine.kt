@@ -39,11 +39,22 @@ private val bulletsFamily =
         GraphicComponent::class
     ).exclude(RemoveComponent::class).get()
 
+private val wallsFamily =
+    allOf(
+        IdComponent::class,
+        TransformComponent::class,
+        ColliderComponent::class,
+        GraphicComponent::class
+    ).exclude(RemoveComponent::class).get()
+
 val Engine.players: List<Entity>
     get() = getEntitiesFor(playersFamily).toList()
 
 val Engine.bullets: List<Entity>
     get() = getEntitiesFor(bulletsFamily).toList()
+
+val Engine.walls: List<Entity>
+    get() = getEntitiesFor(wallsFamily).toList()
 
 fun Engine.createPlayer(
     playerId: Uuid,
@@ -107,7 +118,7 @@ fun Engine.createBullet(
     }
 }
 
-fun Engine.createWall(position: Vector2D, size: Vector2D): Entity {
+fun Engine.createWall(wallId: Uuid = Uuid.random(), position: Vector2D, size: Vector2D): Entity {
     return entity {
         with<TransformComponent> {
             this.setInitialPosition(position.x, position.y, 0f)
@@ -124,6 +135,7 @@ fun Engine.createWall(position: Vector2D, size: Vector2D): Entity {
         with<ColliderComponent> {
             collider = Rectangle(position.x - size.x / 2f, position.y - size.y / 2f, size.x, size.y)
         }
+        with<IdComponent> { id = wallId }
     }
 }
 

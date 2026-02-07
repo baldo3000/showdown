@@ -13,6 +13,7 @@ import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
+import me.baldo3000.showdown.ecs.createWall
 import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
@@ -90,7 +91,7 @@ class ClientNetworkSystem(
                 val entity = idMap.getOrPut(snapshot.id) {
                     val newPlayer = engine.createPlayer(
                         snapshot.id,
-                        Vector2D(snapshot.position.x, snapshot.position.y),
+                        snapshot.position,
                         snapshot.id == networkManager.id
                     )
                     if (networkManager.id == snapshot.id) playerEntity = newPlayer
@@ -110,8 +111,8 @@ class ClientNetworkSystem(
                         snapshot.id,
                         snapshot.sourceId,
                         snapshot.damage,
-                        Vector2D(snapshot.position.x, snapshot.position.y),
-                        Vector2D(snapshot.speed.x, snapshot.speed.y)
+                        snapshot.position,
+                        snapshot.speed
                     )
                     newBullet
                 }
@@ -120,6 +121,17 @@ class ClientNetworkSystem(
                     it.set(snapshot.position.x, snapshot.position.y, it.z)
                 }
                 entity[MoveComponent.mapper]?.speed?.set(snapshot.speed.x, snapshot.speed.y)
+            }
+
+            state.walls.forEach { snapshot ->
+                idMap.getOrPut(snapshot.id) {
+                    val newWall = engine.createWall(
+                        snapshot.id,
+                        snapshot.position,
+                        snapshot.size
+                    )
+                    newWall
+                }
             }
         } else {
             log.error { "Discard input packet out of sequence" }
