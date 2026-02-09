@@ -50,18 +50,19 @@ class CollisionSystem :
                     val otherHealth = other[HealthComponent.mapper]
                     val otherDamage = other[DamageComponent.mapper]
 
-                    // Entity is player and other is not a bullet
-                    if (damage == null && otherDamage == null) {
-                        transform.position.minusAssign(move.speed * deltaTime)
-                        collider.collider.setCenter(transform.position.x, transform.position.y)
-                    }
-                    // Entity is a bullet
-                    else if (damage != null && damage.sourceId != otherId?.id) {
-                        entity.add(RemoveComponent())
-
-                        otherHealth?.apply {
-                            health -= damage.damage
-                            if (health <= 0f) other.add(RemoveComponent())
+                    if (otherDamage == null) {
+                        // Entity is player and other is not a bullet
+                        if (damage == null) {
+                            transform.position.minusAssign(move.speed * deltaTime)
+                            collider.collider.setCenter(transform.position.x, transform.position.y)
+                        }
+                        // Entity is a bullet and other is not a bullet
+                        else if (damage.sourceId != otherId?.id) {
+                            entity.add(RemoveComponent())
+                            otherHealth?.apply {
+                                health -= damage.damage
+                                if (health <= 0f) other.add(RemoveComponent())
+                            }
                         }
                     }
                 }
