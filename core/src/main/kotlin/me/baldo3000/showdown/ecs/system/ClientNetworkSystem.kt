@@ -79,7 +79,7 @@ class ClientNetworkSystem(
     private fun syncWorld(state: WorldSnapshot) {
         if (state.sequenceNumber > lastSnapshotSequenceNumber) {
             lastSnapshotSequenceNumber = state.sequenceNumber
-            val serverIds = state.players.map { it.id } + state.bullets.map { it.id }
+            val serverIds = state.players.map { it.id } + state.bullets.map { it.id } + state.walls.map { it.id }
             for (entity in engine.entities) {
                 val id = entity[IdComponent.mapper]?.id
                 if (id !in serverIds) {
