@@ -1,12 +1,9 @@
 package me.baldo3000.showdown.world
 
-import kotlin.uuid.Uuid
+import me.baldo3000.showdown.network.Vector2D
 
 interface World {
-    fun init()
-
     fun isGameFull(): Boolean
 
-    fun spawnNewPlayer(id: Uuid)
-    fun removePlayer(id: Uuid)
+    fun newPLayerSpawnLocation(): Vector2D
 }

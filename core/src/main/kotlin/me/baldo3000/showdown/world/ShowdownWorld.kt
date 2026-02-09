@@ -2,30 +2,21 @@ package me.baldo3000.showdown.world
 
 import me.baldo3000.showdown.network.Vector2D
 import kotlin.math.roundToInt
-import kotlin.uuid.Uuid
 
 class ShowdownWorld(val mapSize: Vector2D = Vector2D(16f, 9f), val maxPlayers: Int = 10) : World {
-    val spawnLocations: List<Vector2D>
-
-    private var players: Int = 0
+    val availableSpawnLocations: MutableList<Vector2D>
 
     init {
-        spawnLocations = createSpawnLocations(mapSize, maxPlayers)
+        availableSpawnLocations = createSpawnLocations(mapSize, maxPlayers).toMutableList()
     }
 
-    override fun init() {
+    override fun isGameFull() = availableSpawnLocations.isEmpty()
 
+    override fun newPLayerSpawnLocation(): Vector2D {
+        if (isGameFull()) throw IllegalStateException("Cannot spawn new player: game is full")
+        return availableSpawnLocations.removeFirst()
     }
 
-    override fun isGameFull() = players >= maxPlayers
-
-    override fun spawnNewPlayer(id: Uuid) {
-        players++
-    }
-
-    override fun removePlayer(id: Uuid) {
-        players--
-    }
 
     private fun createSpawnLocations(mapSize: Vector2D, locations: Int): List<Vector2D> {
         return if (locations <= 0) {
