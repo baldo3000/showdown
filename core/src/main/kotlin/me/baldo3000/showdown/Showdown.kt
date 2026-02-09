@@ -14,7 +14,6 @@ import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.data.Vector3D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.system.*
-import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.network.BulletSnapshot
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.PlayerSnapshot
@@ -30,17 +29,15 @@ const val UNIT_SCALE = 1 / 16f
 class Showdown : KtxGame<ShowdownScreen>() {
     val gameViewport = ExtendViewport(16f, 9f)
     val batch: Batch by lazy { SpriteBatch() }
-    val eventHandler by lazy { GameEventHandler() }
     val engine: Engine by lazy {
         PooledEngine(10, 1000, 10, 1000).apply {
             addSystem(PlayerInputSystem(gameViewport))
-            addSystem(EventSystem(eventHandler))
-            addSystem(MoveSystem(eventHandler))
+            addSystem(MoveSystem())
             addSystem(CollisionSystem())
             addSystem(CameraSystem(gameViewport))
             addSystem(RenderSystem(batch, gameViewport))
-            addSystem(HostNetworkSystem(8080, eventHandler))
-            //addSystem(ClientNetworkSystem(gameViewport, eventHandler))
+            addSystem(HostNetworkSystem(8080))
+            //addSystem(ClientNetworkSystem(gameViewport))
             addSystem(RemoveSystem())
         }
     }

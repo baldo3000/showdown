@@ -14,7 +14,6 @@ import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.ecs.createWall
-import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.input.removeInputProcessor
@@ -26,8 +25,7 @@ import kotlin.uuid.Uuid
 private const val UPDATE_RATE = 1 / 30f
 
 class ClientNetworkSystem(
-    private val gameViewport: Viewport,
-    private val eventHandler: GameEventHandler
+    private val gameViewport: Viewport
 ) : IntervalSystem(UPDATE_RATE), DummyInputProcessor {
     private val networkManager: ClientNetworkManager
     private val idMap = mutableMapOf<Uuid, Entity>()

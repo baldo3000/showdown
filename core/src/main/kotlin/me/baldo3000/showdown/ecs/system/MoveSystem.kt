@@ -11,11 +11,10 @@ import me.baldo3000.showdown.ecs.component.ColliderComponent
 import me.baldo3000.showdown.ecs.component.MoveComponent
 import me.baldo3000.showdown.ecs.component.RemoveComponent
 import me.baldo3000.showdown.ecs.component.TransformComponent
-import me.baldo3000.showdown.event.GameEventHandler
 
 private const val UPDATE_RATE = 1 / 60f
 
-class MoveSystem(private val eventHandler: GameEventHandler) :
+class MoveSystem() :
     IteratingSystem(allOf(TransformComponent::class, MoveComponent::class).exclude(RemoveComponent::class).get()) {
     private var accumulator = 0f
 
