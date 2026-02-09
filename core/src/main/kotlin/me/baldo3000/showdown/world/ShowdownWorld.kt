@@ -1,6 +1,8 @@
 package me.baldo3000.showdown.world
 
-import me.baldo3000.showdown.network.Vector2D
+import ktx.math.component1
+import ktx.math.component2
+import me.baldo3000.showdown.data.Vector2D
 import kotlin.math.roundToInt
 
 class ShowdownWorld(val mapSize: Vector2D = Vector2D(16f, 9f), val maxPlayers: Int = 10) : World {
@@ -12,7 +14,7 @@ class ShowdownWorld(val mapSize: Vector2D = Vector2D(16f, 9f), val maxPlayers: I
 
     override fun isGameFull() = availableSpawnLocations.isEmpty()
 
-    override fun newPLayerSpawnLocation(): Vector2D {
+    override fun newPlayerSpawnLocation(): Vector2D {
         if (isGameFull()) throw IllegalStateException("Cannot spawn new player: game is full")
         return availableSpawnLocations.removeFirst()
     }
@@ -42,7 +44,7 @@ class ShowdownWorld(val mapSize: Vector2D = Vector2D(16f, 9f), val maxPlayers: I
                 )
                 val cornersToPlace = minOf(locations, 4)
                 pts += corners.take(cornersToPlace)
-                var remaining = locations - cornersToPlace
+                val remaining = locations - cornersToPlace
                 if (remaining > 0) {
                     val shortLen = minOf(innerW, innerH)
                     val longLen = maxOf(innerW, innerH)

@@ -2,8 +2,8 @@ package me.baldo3000.showdown.screen
 
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
+import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.createPlayer
-import me.baldo3000.showdown.network.Vector2D
 import kotlin.math.min
 import kotlin.uuid.Uuid
 

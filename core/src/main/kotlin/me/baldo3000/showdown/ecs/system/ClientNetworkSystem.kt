@@ -5,11 +5,11 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.Viewport
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
+import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
@@ -19,7 +19,6 @@ import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.input.removeInputProcessor
 import me.baldo3000.showdown.network.PlayerInputPacket
-import me.baldo3000.showdown.network.Vector2D
 import me.baldo3000.showdown.network.WorldSnapshot
 import network.ClientNetworkManager
 import kotlin.uuid.Uuid
@@ -37,7 +36,7 @@ class ClientNetworkSystem(
     private var connected = false
     private var playerEntity: Entity? = null
 
-    private var tmpShootVector: Vector2? = null
+    private var tmpShootVector: Vector2D? = null
     private var horizontal = 0
     private var vertical = 0
 
@@ -145,7 +144,7 @@ class ClientNetworkSystem(
                     id,
                     horizontal,
                     vertical,
-                    tmpShootVector?.let { Vector2D(it.x, it.y) },
+                    tmpShootVector,
                     inputSequenceNumber++
                 )
                 val bytes = Json.encodeToString(inputPacket).toByteArray()
@@ -178,7 +177,8 @@ class ClientNetworkSystem(
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        tmpShootVector = Vector2(screenX.toFloat(), screenY.toFloat())
+        tmpShootVector = Vector2D(screenX.toFloat(), screenY.toFloat())
+
         gameViewport.unproject(tmpShootVector)
         sendPlayerInput()
         return super.touchDown(screenX, screenY, pointer, button)

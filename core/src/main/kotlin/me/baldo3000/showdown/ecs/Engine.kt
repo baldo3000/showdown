@@ -9,8 +9,8 @@ import ktx.ashley.entity
 import ktx.ashley.exclude
 import ktx.ashley.with
 import me.baldo3000.showdown.UNIT_SCALE
+import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.network.Vector2D
 import me.baldo3000.showdown.ui.Textures
 import me.baldo3000.showdown.world.ShowdownWorld
 import kotlin.uuid.Uuid
@@ -69,8 +69,7 @@ fun Engine.createPlayer(
         with<IdComponent> { id = playerId }
         with<TransformComponent> {
             this.setInitialPosition(position.x, position.y, 0f)
-            this.size.x = PLAYER_SIZE
-            this.size.y = PLAYER_SIZE
+            this.size.set(PLAYER_SIZE, PLAYER_SIZE)
         }
         with<ColliderComponent> { collider = Circle(position.x, position.y, PLAYER_SIZE / 2) }
         with<MoveComponent>()
@@ -96,13 +95,11 @@ fun Engine.createBullet(
         with<IdComponent> { id = bulletId }
         with<TransformComponent> {
             this.setInitialPosition(position.x, position.y, -1f)
-            this.size.x = BULLET_SIZE
-            this.size.y = BULLET_SIZE
+            this.size.set(BULLET_SIZE, BULLET_SIZE)
         }
         with<ColliderComponent> { collider = Circle(position.x, position.y, BULLET_SIZE / 2) }
         with<MoveComponent> {
-            this.speed.x = speed.x
-            this.speed.y = speed.y
+            this.speed.set(speed)
         }
         with<GraphicComponent> {
             sprite.run {
@@ -122,8 +119,7 @@ fun Engine.createWall(wallId: Uuid = Uuid.random(), position: Vector2D, size: Ve
     return entity {
         with<TransformComponent> {
             this.setInitialPosition(position.x, position.y, 0f)
-            this.size.x = size.x
-            this.size.y = size.y
+            this.size.set(size)
         }
         with<GraphicComponent> {
             sprite.run {

@@ -1,9 +1,9 @@
 package me.baldo3000.showdown.world
 
-import me.baldo3000.showdown.network.Vector2D
+import me.baldo3000.showdown.data.Vector2D
 
 interface World {
     fun isGameFull(): Boolean
 
-    fun newPLayerSpawnLocation(): Vector2D
+    fun newPlayerSpawnLocation(): Vector2D
 }

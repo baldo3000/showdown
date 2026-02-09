@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import ktx.app.KtxGame
 import ktx.log.logger
+import me.baldo3000.showdown.data.Vector2D
+import me.baldo3000.showdown.data.Vector3D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.event.GameEventHandler
@@ -83,6 +85,8 @@ class Showdown : KtxGame<ShowdownScreen>() {
         PlayerSnapshot.serializer()
         BulletSnapshot.serializer()
         WorldSnapshot.serializer()
+        Vector2D.serializer()
+        Vector3D.serializer()
     }
 
     companion object {

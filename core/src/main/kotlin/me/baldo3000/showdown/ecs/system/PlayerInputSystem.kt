@@ -4,16 +4,15 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.ashley.allOf
 import ktx.ashley.get
 import ktx.log.logger
+import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
-import me.baldo3000.showdown.network.Vector2D
 import kotlin.uuid.Uuid
 
 const val PLAYER_SPEED = 3f
@@ -26,8 +25,8 @@ class PlayerInputSystem(
     private val entities
         get() = engine.getEntitiesFor(family)
 
-    private val tmpSpeedVector = Vector2()
-    private val tmpShootVector = Vector2()
+    private val tmpSpeedVector = Vector2D()
+    private val tmpShootVector = Vector2D()
     private var horizontal = 0
     private var vertical = 0
 
@@ -75,15 +74,16 @@ class PlayerInputSystem(
         val move = entity[MoveComponent.mapper]
         require(move != null) { "Entity must have a MoveComponent. Entity: $entity" }
 
-        val distX = tmpShootVector.x - transform.position.x
-        val distY = tmpShootVector.y - transform.position.y
-        tmpSpeedVector.set(distX, distY).nor()
+        tmpSpeedVector.set(
+            tmpShootVector.x - transform.position.x,
+            tmpShootVector.y - transform.position.y
+        ).nor()
 
         engine.createBullet(
             Uuid.random(),
             entity[IdComponent.mapper]?.id,
             DEFAULT_DAMAGE,
-            Vector2D(transform.position.x, transform.position.y),
+            transform.position.to2D(),
             Vector2D(tmpSpeedVector.x * 5f, tmpSpeedVector.y * 5f)
         )
     }

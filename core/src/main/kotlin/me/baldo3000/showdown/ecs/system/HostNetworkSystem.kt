@@ -4,15 +4,14 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.math.Vector2
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
 import ktx.log.logger
+import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.*
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.event.GameEventHandler
 import me.baldo3000.showdown.network.PlayerInputPacket
-import me.baldo3000.showdown.network.Vector2D
 import me.baldo3000.showdown.network.WorldSnapshot
 import me.baldo3000.showdown.world.ShowdownWorld
 import network.HostNetworkManager
@@ -28,6 +27,9 @@ class HostNetworkSystem(
     private var snapshotSequenceNumber = 0
     private val playerEntities = mutableMapOf<Uuid, Entity>()
     private val playerLastInputSequenceNumbers = mutableMapOf<Uuid, Int>()
+
+    private val speedVector = Vector2D()
+    private val bulletSpeedVector = Vector2D()
 
     init {
         networkManager = HostNetworkManager(
@@ -88,7 +90,7 @@ class HostNetworkSystem(
         if (lastSequenceNumber != null) {
             if (playerInput.sequenceNumber > lastSequenceNumber) {
                 playerLastInputSequenceNumbers[playerInput.id] = playerInput.sequenceNumber
-                val speedVector = Vector2(playerInput.horizontal.toFloat(), playerInput.vertical.toFloat()).nor()
+                speedVector.set(playerInput.horizontal.toFloat(), playerInput.vertical.toFloat()).nor()
                 engine.entities.forEach {
                     val id = it[IdComponent.mapper] ?: return@forEach
                     val move = it[MoveComponent.mapper] ?: return@forEach
@@ -97,14 +99,15 @@ class HostNetworkSystem(
                         move.speed.x = speedVector.x * 3f
                         move.speed.y = speedVector.y * 3f
                         if (playerInput.touching != null) {
-                            val distX = playerInput.touching.x - transform.position.x
-                            val distY = playerInput.touching.y - transform.position.y
-                            val bulletSpeedVector = Vector2(distX, distY).nor()
+                            bulletSpeedVector.set(
+                                playerInput.touching.x - transform.position.x,
+                                playerInput.touching.y - transform.position.y
+                            ).nor()
                             engine.createBullet(
                                 Uuid.random(),
                                 id.id,
                                 DEFAULT_DAMAGE,
-                                Vector2D(transform.position.x, transform.position.y),
+                                transform.position.to2D(),
                                 Vector2D(bulletSpeedVector.x * 5f, bulletSpeedVector.y * 5f)
                             )
                         }

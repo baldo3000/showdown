@@ -1,22 +1,20 @@
 package me.baldo3000.showdown.ecs.component
 
 import com.badlogic.ashley.core.Component
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Pool
 import ktx.ashley.mapperFor
+import me.baldo3000.showdown.data.Vector2D
+import me.baldo3000.showdown.data.Vector3D
 
 class TransformComponent : Component, Pool.Poolable, Comparable<TransformComponent> {
-    val position = Vector3()
-    val previousPosition = Vector3()
-    val interpolatedPosition = Vector3()
-    val size = Vector2(1f, 1f)
+    val position = Vector3D()
+    val previousPosition = Vector3D()
+    val interpolatedPosition = Vector3D()
+    val size = Vector2D(1f, 1f)
     var rotationDeg = 0f
 
     override fun reset() {
-        position.set(Vector3.Zero)
-        previousPosition.set(Vector3.Zero)
-        interpolatedPosition.set(Vector3.Zero)
+        setInitialPosition(0f, 0f, 0f)
         size.set(1f, 1f)
         rotationDeg = 0f
     }

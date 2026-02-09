@@ -3,14 +3,9 @@ package me.baldo3000.showdown.network
 import com.badlogic.ashley.core.Entity
 import kotlinx.serialization.Serializable
 import ktx.ashley.get
+import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
 import kotlin.uuid.Uuid
-
-@Serializable
-data class Vector2D(
-    val x: Float,
-    val y: Float
-)
 
 @Serializable
 data class PlayerSnapshot(
@@ -23,7 +18,7 @@ data class PlayerSnapshot(
         fun fromEntity(entity: Entity): PlayerSnapshot {
             val id = entity[IdComponent.mapper]?.id
                 ?: throw IllegalArgumentException("Entity must have an IdComponent. Entity: $entity")
-            val position = entity[TransformComponent.mapper]?.position?.let { Vector2D(it.x, it.y) }
+            val position = entity[TransformComponent.mapper]?.position?.to2D()
                 ?: throw IllegalArgumentException("Entity must have a TransformComponent. Entity: $entity")
             val speed = entity[MoveComponent.mapper]?.speed?.let { Vector2D(it.x, it.y) }
                 ?: throw IllegalArgumentException("Entity must have a MoveComponent. Entity: $entity")
@@ -46,9 +41,9 @@ data class BulletSnapshot(
         fun fromEntity(entity: Entity): BulletSnapshot {
             val id = entity[IdComponent.mapper]?.id
                 ?: throw IllegalArgumentException("Entity must have an IdComponent. Entity: $entity")
-            val position = entity[TransformComponent.mapper]?.position?.let { Vector2D(it.x, it.y) }
+            val position = entity[TransformComponent.mapper]?.position?.to2D()
                 ?: throw IllegalArgumentException("Entity must have a TransformComponent. Entity: $entity")
-            val speed = entity[MoveComponent.mapper]?.speed?.let { Vector2D(it.x, it.y) }
+            val speed = entity[MoveComponent.mapper]?.speed
                 ?: throw IllegalArgumentException("Entity must have a MoveComponent. Entity: $entity")
             val damage = entity[DamageComponent.mapper]
                 ?: throw IllegalArgumentException("Entity must have a DamageComponent. Entity: $entity")
@@ -69,10 +64,7 @@ data class WallSnapshot(
                 ?: throw IllegalArgumentException("Entity must have an IdComponent. Entity: $entity")
             val position = entity[TransformComponent.mapper]
                 ?: throw IllegalArgumentException("Entity must have a TransformComponent. Entity: $entity")
-            return WallSnapshot(
-                id,
-                position.position.let { Vector2D(it.x, it.y) },
-                position.size.let { Vector2D(it.x, it.y) })
+            return WallSnapshot(id, position.position.to2D(), position.size)
         }
     }
 }

@@ -1,7 +1,7 @@
 package me.baldo3000.showdown.event.api
 
 import kotlinx.serialization.Serializable
-import me.baldo3000.showdown.network.Vector2D
+import me.baldo3000.showdown.data.Vector2D
 import kotlin.uuid.Uuid
 
 @Serializable
