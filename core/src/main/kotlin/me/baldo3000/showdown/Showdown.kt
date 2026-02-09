@@ -13,6 +13,10 @@ import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.event.GameEventHandler
+import me.baldo3000.showdown.network.BulletSnapshot
+import me.baldo3000.showdown.network.PlayerInputPacket
+import me.baldo3000.showdown.network.PlayerSnapshot
+import me.baldo3000.showdown.network.WorldSnapshot
 import me.baldo3000.showdown.screen.GameScreen
 import me.baldo3000.showdown.screen.HomeScreen
 import me.baldo3000.showdown.screen.ShowdownScreen
@@ -33,14 +37,14 @@ class Showdown : KtxGame<ShowdownScreen>() {
             addSystem(CollisionSystem())
             addSystem(CameraSystem(gameViewport))
             addSystem(RenderSystem(batch, gameViewport))
-            //addSystem(HostNetworkSystem(8080, eventHandler))
-            addSystem(ClientNetworkSystem(gameViewport, eventHandler))
+            addSystem(HostNetworkSystem(8080, eventHandler))
+            //addSystem(ClientNetworkSystem(gameViewport, eventHandler))
             addSystem(RemoveSystem())
         }
     }
 
     override fun create() {
-        loadComponentMappers()
+        load()
         Gdx.app.logLevel = Application.LOG_DEBUG
         Gdx.input.inputProcessor = InputMultiplexer()
         log.debug { "Game instance created" }
@@ -56,6 +60,11 @@ class Showdown : KtxGame<ShowdownScreen>() {
         Textures.dispose()
     }
 
+    private fun load() {
+        loadComponentMappers()
+        loadSerializers()
+    }
+
     private fun loadComponentMappers() {
         CameraComponent.mapper
         ColliderComponent.mapper
@@ -67,6 +76,13 @@ class Showdown : KtxGame<ShowdownScreen>() {
         MoveComponent.mapper
         RemoveComponent.mapper
         TransformComponent.mapper
+    }
+
+    private fun loadSerializers() {
+        PlayerInputPacket.serializer()
+        PlayerSnapshot.serializer()
+        BulletSnapshot.serializer()
+        WorldSnapshot.serializer()
     }
 
     companion object {

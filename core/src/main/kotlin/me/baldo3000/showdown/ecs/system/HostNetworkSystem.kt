@@ -11,7 +11,9 @@ import ktx.log.logger
 import me.baldo3000.showdown.ecs.*
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.event.GameEventHandler
-import me.baldo3000.showdown.network.*
+import me.baldo3000.showdown.network.PlayerInputPacket
+import me.baldo3000.showdown.network.Vector2D
+import me.baldo3000.showdown.network.WorldSnapshot
 import me.baldo3000.showdown.world.ShowdownWorld
 import network.HostNetworkManager
 import kotlin.uuid.Uuid
@@ -28,7 +30,6 @@ class HostNetworkSystem(
     private val playerLastInputSequenceNumbers = mutableMapOf<Uuid, Int>()
 
     init {
-        loadSerializers()
         networkManager = HostNetworkManager(
             port,
             onPeerConnect = { peerId ->
@@ -113,13 +114,6 @@ class HostNetworkSystem(
                 log.error { "Discard input packet out of sequence" }
             }
         }
-    }
-
-    private fun loadSerializers() {
-        PlayerInputPacket.serializer()
-        PlayerSnapshot.serializer()
-        BulletSnapshot.serializer()
-        WorldSnapshot.serializer()
     }
 
     companion object {
