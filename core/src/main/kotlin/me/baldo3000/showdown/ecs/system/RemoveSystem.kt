@@ -14,6 +14,7 @@ class RemoveSystem : IteratingSystem(allOf(RemoveComponent::class).get()) {
 
         remove.delay -= deltaTime
         if (remove.delay <= 0f) {
+            entity.removeAll()
             engine.removeEntity(entity)
         }
     }
