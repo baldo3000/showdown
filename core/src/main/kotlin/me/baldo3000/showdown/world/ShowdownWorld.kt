@@ -6,7 +6,7 @@ import me.baldo3000.showdown.data.Vector2D
 import kotlin.math.roundToInt
 
 class ShowdownWorld(val mapSize: Vector2D = Vector2D(16f, 9f), val maxPlayers: Int = 10) : World {
-    val availableSpawnLocations: MutableList<Vector2D>
+    private val availableSpawnLocations: MutableList<Vector2D>
 
     init {
         availableSpawnLocations = createSpawnLocations(mapSize, maxPlayers).toMutableList()
@@ -25,7 +25,9 @@ class ShowdownWorld(val mapSize: Vector2D = Vector2D(16f, 9f), val maxPlayers: I
             emptyList()
         } else {
             val (w, h) = mapSize
-            val margin = (minOf(w, h) * 0.05f).coerceAtMost(minOf(w, h) / 2f)
+            val defaultMargin = minOf(w, h) * 0.05f
+            val minBorderMargin = 1f
+            val margin = defaultMargin.coerceAtLeast(minBorderMargin).coerceAtMost(minOf(w, h) / 2f)
             val innerW = (w - 2f * margin).coerceAtLeast(0f)
             val innerH = (h - 2f * margin).coerceAtLeast(0f)
 

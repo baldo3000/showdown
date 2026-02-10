@@ -1,7 +1,6 @@
 package me.baldo3000.showdown.ecs.system
 
 import com.badlogic.ashley.core.Engine
-import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.Gdx
 import kotlinx.serialization.json.Json
@@ -12,7 +11,6 @@ import me.baldo3000.showdown.ecs.*
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
-import me.baldo3000.showdown.world.ShowdownWorld
 import network.HostNetworkManager
 import kotlin.uuid.Uuid
 
@@ -21,7 +19,6 @@ private const val UPDATE_RATE = 1 / 30f
 class HostNetworkSystem(port: Int) : IntervalSystem(UPDATE_RATE) {
     private val networkManager: HostNetworkManager
     private var snapshotSequenceNumber = 0
-    private val playerEntities = mutableMapOf<Uuid, Entity>()
     private val playerLastInputSequenceNumbers = mutableMapOf<Uuid, Int>()
 
     private val speedVector = Vector2D()
@@ -32,17 +29,19 @@ class HostNetworkSystem(port: Int) : IntervalSystem(UPDATE_RATE) {
             port,
             onPeerConnect = { peerId ->
                 Gdx.app.postRunnable {
-                    val player = engine.createPlayer(peerId, controllable = false)
-                    playerEntities[peerId] = player
+                    engine.spawnPlayer(peerId, false)
                     playerLastInputSequenceNumbers[peerId] = -1
                 }
             },
             onPeerDisconnect = { peerId ->
                 Gdx.app.postRunnable {
-                    playerEntities[peerId]?.let { entity ->
-                        playerEntities.remove(peerId)
-                        playerLastInputSequenceNumbers.remove(peerId)
-                        entity.add(RemoveComponent())
+                    for (entity in engine.players) {
+                        entity[IdComponent.mapper]?.let { id ->
+                            if (id.id == peerId) {
+                                playerLastInputSequenceNumbers.remove(peerId)
+                                entity.add(RemoveComponent())
+                            }
+                        }
                     }
                 }
             })
@@ -50,8 +49,8 @@ class HostNetworkSystem(port: Int) : IntervalSystem(UPDATE_RATE) {
 
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
-        engine.createPlayer(Uuid.random(), controllable = true)
-        engine.initializeWorld(ShowdownWorld())
+        engine.spawnPlayer(Uuid.random(), true)
+        engine.spawnWalls()
         networkManager.start()
     }
 

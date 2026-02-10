@@ -24,6 +24,7 @@ import me.baldo3000.showdown.screen.GameScreen
 import me.baldo3000.showdown.screen.HomeScreen
 import me.baldo3000.showdown.screen.ShowdownScreen
 import me.baldo3000.showdown.ui.Textures
+import me.baldo3000.showdown.world.ShowdownWorld
 
 const val UNIT_SCALE = 1 / 16f
 
@@ -40,7 +41,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
             addSystem(RenderSystem(batch, gameViewport))
             addSystem(HostNetworkSystem(8080))
             //addSystem(ClientNetworkSystem(gameViewport))
-            addSystem(GameEventsSystem())
+            addSystem(GameEventsSystem(ShowdownWorld()))
             addSystem(RemoveSystem())
         }
     }

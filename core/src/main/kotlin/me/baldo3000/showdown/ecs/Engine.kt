@@ -11,6 +11,8 @@ import ktx.ashley.with
 import me.baldo3000.showdown.UNIT_SCALE
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.ecs.component.event.PlayerSpawnComponent
+import me.baldo3000.showdown.ecs.component.event.WallsSpawnComponent
 import me.baldo3000.showdown.ui.Textures
 import me.baldo3000.showdown.world.ShowdownWorld
 import kotlin.uuid.Uuid
@@ -143,7 +145,7 @@ fun Engine.createWall(wallId: Uuid = Uuid.random(), position: Vector2D, size: Ve
     }
 }
 
-fun Engine.initializeWorld(world: ShowdownWorld) {
+fun Engine.spawnWallsFromWorld(world: ShowdownWorld) {
     val width = world.mapSize.x
     val height = world.mapSize.y
 
@@ -174,4 +176,19 @@ fun Engine.initializeWorld(world: ShowdownWorld) {
 
 fun Engine.reset() {
     removeAllEntities()
+}
+
+// Events spawning
+
+fun Engine.spawnPlayer(playerId: Uuid, controllable: Boolean) {
+    entity {
+        with<PlayerSpawnComponent> {
+            this.playerId = playerId
+            this.controllable = controllable
+        }
+    }
+}
+
+fun Engine.spawnWalls() {
+    entity { with<WallsSpawnComponent>() }
 }
