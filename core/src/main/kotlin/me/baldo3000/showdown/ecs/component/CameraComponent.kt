@@ -5,8 +5,7 @@ import com.badlogic.gdx.utils.Pool
 import ktx.ashley.mapperFor
 
 class CameraComponent : Component, Pool.Poolable {
-    override fun reset() {
-    }
+    override fun reset() {}
 
     companion object {
         val mapper = mapperFor<CameraComponent>()

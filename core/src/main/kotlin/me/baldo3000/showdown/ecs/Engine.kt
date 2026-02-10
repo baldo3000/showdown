@@ -29,6 +29,11 @@ private val playersFamily =
         GraphicComponent::class
     ).exclude(RemoveComponent::class).get()
 
+private val characterFamily =
+    allOf(
+        InputComponent::class
+    ).exclude(RemoveComponent::class).get()
+
 private val bulletsFamily =
     allOf(
         IdComponent::class,
@@ -49,6 +54,9 @@ private val wallsFamily =
 
 val Engine.players: List<Entity>
     get() = getEntitiesFor(playersFamily).toList()
+
+val Engine.character: Entity?
+    get() = getEntitiesFor(characterFamily).firstOrNull()
 
 val Engine.bullets: List<Entity>
     get() = getEntitiesFor(bulletsFamily).toList()

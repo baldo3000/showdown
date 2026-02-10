@@ -6,13 +6,15 @@ import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Intersector
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Shape2D
-import ktx.ashley.allOf
-import ktx.ashley.exclude
-import ktx.ashley.get
+import ktx.ashley.*
 import ktx.log.logger
 import ktx.math.minusAssign
 import ktx.math.times
+import me.baldo3000.showdown.ecs.character
 import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.ecs.component.event.DefeatComponent
+import me.baldo3000.showdown.ecs.component.event.VictoryComponent
+import me.baldo3000.showdown.ecs.players
 
 private const val UPDATE_RATE = 1 / 60f
 
@@ -61,7 +63,14 @@ class CollisionSystem :
                             entity.add(RemoveComponent())
                             otherHealth?.apply {
                                 health -= damage.damage
-                                if (health <= 0f) other.add(RemoveComponent())
+                                if (health <= 0f) {
+                                    if (other == engine.character) {
+                                        engine.entity { with<DefeatComponent>() }
+                                    } else if (engine.players.size == 2) {
+                                        engine.entity { with<VictoryComponent>() }
+                                    }
+                                    other.add(RemoveComponent())
+                                }
                             }
                         }
                     }
