@@ -13,6 +13,7 @@ import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
+import me.baldo3000.showdown.input.removeInputProcessor
 import kotlin.uuid.Uuid
 
 const val PLAYER_SPEED = 3f
@@ -49,7 +50,7 @@ class PlayerInputSystem(
     }
 
     override fun removedFromEngine(engine: Engine) {
-        addInputProcessor(this)
+        removeInputProcessor(this)
         super.removedFromEngine(engine)
     }
 
