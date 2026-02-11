@@ -20,7 +20,6 @@ const val PLAYER_SPEED = 3f
 class PlayerInputSystem(
     private val gameViewport: Viewport
 ) : EntitySystem(), DummyInputProcessor {
-
     private val family = allOf(InputComponent::class, TransformComponent::class, MoveComponent::class).get()
     private val entities
         get() = engine.getEntitiesFor(family)
@@ -29,6 +28,16 @@ class PlayerInputSystem(
     private val tmpShootVector = Vector2D()
     private var horizontal = 0
     private var vertical = 0
+
+    var inputEnabled = true
+        set(value) {
+            if (!value) {
+                horizontal = 0
+                vertical = 0
+                updateEntitySpeeds()
+            }
+            field = value
+        }
 
     init {
         setProcessing(false)
@@ -45,11 +54,11 @@ class PlayerInputSystem(
     }
 
     private fun updateEntitySpeeds() {
-        entities.forEach(::updateEntitySpeed)
+        if (inputEnabled) entities.forEach(::updateEntitySpeed)
     }
 
     private fun shootFromEntities() {
-        entities.forEach(::shootFromEntity)
+        if (inputEnabled) entities.forEach(::shootFromEntity)
     }
 
     private fun updateEntitySpeed(entity: Entity) {
@@ -90,10 +99,10 @@ class PlayerInputSystem(
 
     override fun keyDown(keycode: Int): Boolean {
         when (keycode) {
-            Input.Keys.W, Input.Keys.UP -> vertical += 1
-            Input.Keys.S, Input.Keys.DOWN -> vertical -= 1
-            Input.Keys.A, Input.Keys.LEFT -> horizontal -= 1
-            Input.Keys.D, Input.Keys.RIGHT -> horizontal += 1
+            Input.Keys.W, Input.Keys.UP -> vertical++
+            Input.Keys.S, Input.Keys.DOWN -> vertical--
+            Input.Keys.A, Input.Keys.LEFT -> horizontal--
+            Input.Keys.D, Input.Keys.RIGHT -> horizontal++
         }
         updateEntitySpeeds()
         return super.keyDown(keycode)
@@ -101,10 +110,10 @@ class PlayerInputSystem(
 
     override fun keyUp(keycode: Int): Boolean {
         when (keycode) {
-            Input.Keys.W, Input.Keys.UP -> vertical -= 1
-            Input.Keys.S, Input.Keys.DOWN -> vertical += 1
-            Input.Keys.A, Input.Keys.LEFT -> horizontal += 1
-            Input.Keys.D, Input.Keys.RIGHT -> horizontal -= 1
+            Input.Keys.W, Input.Keys.UP -> vertical--
+            Input.Keys.S, Input.Keys.DOWN -> vertical++
+            Input.Keys.A, Input.Keys.LEFT -> horizontal++
+            Input.Keys.D, Input.Keys.RIGHT -> horizontal--
         }
         updateEntitySpeeds()
         return super.keyUp(keycode)
