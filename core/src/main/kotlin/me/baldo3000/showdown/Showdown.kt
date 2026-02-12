@@ -7,15 +7,21 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxGame
 import ktx.log.logger
+import ktx.scene2d.Scene2DSkin
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.data.Vector3D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.component.event.DefeatComponent
 import me.baldo3000.showdown.ecs.component.event.VictoryComponent
 import me.baldo3000.showdown.ecs.system.*
+import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.network.BulletSnapshot
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.PlayerSnapshot
@@ -24,25 +30,32 @@ import me.baldo3000.showdown.screen.GameScreen
 import me.baldo3000.showdown.screen.HomeScreen
 import me.baldo3000.showdown.screen.ShowdownScreen
 import me.baldo3000.showdown.ui.Textures
+import me.baldo3000.showdown.ui.createSkin
 import me.baldo3000.showdown.world.ShowdownWorld
 
+const val V_WIDTH = 16
+const val V_HEIGHT = 9
 const val UNIT_SCALE = 1 / 16f
 
 /** [com.badlogic.gdx.ApplicationListener] implementation shared by all platforms. */
 class Showdown : KtxGame<ShowdownScreen>() {
-    val gameViewport = ExtendViewport(16f, 9f)
-    val batch: Batch by lazy { SpriteBatch() }
+    val gameViewport = ExtendViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat())
+    val stage: Stage by lazy {
+        val result = Stage(ScreenViewport())
+        addInputProcessor(result)
+        result
+    }
     val engine: Engine by lazy {
         PooledEngine(10, 1000, 10, 1000).apply {
-            addSystem(PlayerInputSystem(gameViewport))
-            addSystem(MoveSystem())
-            addSystem(CollisionSystem())
-            addSystem(CameraSystem(gameViewport))
-            addSystem(RenderSystem(batch, gameViewport))
-            addSystem(HostNetworkSystem(8080))
-            //addSystem(ClientNetworkSystem(gameViewport))
-            addSystem(GameEventsSystem(ShowdownWorld()))
-            addSystem(RemoveSystem())
+            addSystem(PlayerInputSystem(gameViewport).apply { setProcessing(false) })
+            addSystem(MoveSystem().apply { setProcessing(false) })
+            addSystem(CollisionSystem().apply { setProcessing(false) })
+            addSystem(CameraSystem(gameViewport).apply { setProcessing(false) })
+            addSystem(RenderSystem(stage.batch, gameViewport).apply { setProcessing(false) })
+            addSystem(HostNetworkSystem().apply { setProcessing(false) })
+            addSystem(ClientNetworkSystem(gameViewport).apply { setProcessing(false) })
+            addSystem(GameEventsSystem(ShowdownWorld()).apply { setProcessing(false) })
+            addSystem(RemoveSystem().apply { setProcessing(false) })
         }
     }
 
@@ -50,17 +63,17 @@ class Showdown : KtxGame<ShowdownScreen>() {
         load()
         Gdx.app.logLevel = Application.LOG_DEBUG
         Gdx.input.inputProcessor = InputMultiplexer()
+        createSkin()
         log.debug { "Game instance created" }
         addScreen(HomeScreen(this))
         addScreen(GameScreen(this))
-        setScreen<GameScreen>()
+        setScreen<HomeScreen>()
     }
 
     override fun dispose() {
         super.dispose()
-        log.debug { "Max amount of sprites: ${(batch as SpriteBatch).maxSpritesInBatch}" }
-        batch.dispose()
         Textures.dispose()
+        stage.dispose()
     }
 
     private fun load() {

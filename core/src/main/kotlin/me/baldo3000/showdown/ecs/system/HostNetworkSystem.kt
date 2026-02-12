@@ -16,7 +16,7 @@ import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 30f
 
-class HostNetworkSystem(port: Int) : IntervalSystem(UPDATE_RATE) {
+class HostNetworkSystem : IntervalSystem(UPDATE_RATE) {
     private val networkManager: HostNetworkManager
     private var snapshotSequenceNumber = 0
     private val playerLastInputSequenceNumbers = mutableMapOf<Uuid, Int>()
@@ -26,7 +26,6 @@ class HostNetworkSystem(port: Int) : IntervalSystem(UPDATE_RATE) {
 
     init {
         networkManager = HostNetworkManager(
-            port,
             onPeerConnect = { peerId ->
                 Gdx.app.postRunnable {
                     engine.spawnPlayer(peerId, false)
@@ -47,14 +46,23 @@ class HostNetworkSystem(port: Int) : IntervalSystem(UPDATE_RATE) {
             })
     }
 
-    override fun addedToEngine(engine: Engine) {
-        super.addedToEngine(engine)
-        engine.spawnPlayer(Uuid.random(), true)
-        engine.spawnWalls()
-        networkManager.start()
+    override fun setProcessing(processing: Boolean) {
+        super.setProcessing(processing)
+        if (processing) {
+            engine.reset()
+            engine.spawnPlayer(Uuid.random(), true)
+            engine.spawnWalls()
+            networkManager.start(8080)
+        } else {
+            networkManager.stop()
+        }
     }
 
-    override fun removedFromEngine(engine: Engine) {
+    override fun addedToEngine(engine: Engine?) {
+        super.addedToEngine(engine)
+    }
+
+    override fun removedFromEngine(engine: Engine?) {
         super.removedFromEngine(engine)
         networkManager.stop()
     }
@@ -81,6 +89,7 @@ class HostNetworkSystem(port: Int) : IntervalSystem(UPDATE_RATE) {
     }
 
     private fun processPlayerInput(playerInput: PlayerInputPacket) {
+        log.debug { "Processing input packet: $playerInput" }
         val lastSequenceNumber = playerLastInputSequenceNumbers[playerInput.id]
         if (lastSequenceNumber != null) {
             if (playerInput.sequenceNumber > lastSequenceNumber) {

@@ -25,6 +25,7 @@ gdx-svmhelper-backend-lwjgl3 = { module = "io.github.berstanio:gdx-svmhelper-bac
 ashley = { module = "com.badlogicgames.ashley:ashley", version.ref = "ashley" }
 
 # KTX
+ktx-actors = { module = "io.github.libktx:ktx-actors", version.ref = "ktx" }
 ktx-app = { module = "io.github.libktx:ktx-app", version.ref = "ktx" }
 ktx-ashley = { module = "io.github.libktx:ktx-ashley", version.ref = "ktx" }
 ktx-async = { module = "io.github.libktx:ktx-async", version.ref = "ktx" }
@@ -33,6 +34,8 @@ ktx-graphics = { module = "io.github.libktx:ktx-graphics", version.ref = "ktx" }
 ktx-json = { module = "io.github.libktx:ktx-json", version.ref = "ktx" }
 ktx-log = { module = "io.github.libktx:ktx-log", version.ref = "ktx" }
 ktx-math = { module = "io.github.libktx:ktx-math", version.ref = "ktx" }
+ktx-scene2d = { module = "io.github.libktx:ktx-scene2d", version.ref = "ktx" }
+ktx-style = { module = "io.github.libktx:ktx-style", version.ref = "ktx" }
 
 # Kotlin
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }

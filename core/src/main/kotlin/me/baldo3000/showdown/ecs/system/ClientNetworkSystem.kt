@@ -14,6 +14,9 @@ import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.ecs.createWall
+import me.baldo3000.showdown.ecs.reset
+import me.baldo3000.showdown.ecs.spawnPlayer
+import me.baldo3000.showdown.ecs.spawnWalls
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.input.removeInputProcessor
@@ -44,14 +47,18 @@ class ClientNetworkSystem(
         })
     }
 
-    override fun addedToEngine(engine: Engine) {
-        addInputProcessor(this)
-        super.addedToEngine(engine)
-        networkManager.connect("127.0.0.1", 8080)
+    override fun setProcessing(processing: Boolean) {
+        super.setProcessing(processing)
+        if (processing) {
+            addInputProcessor(this)
+            networkManager.connect("127.0.0.1", 8080)
+        } else {
+            removeInputProcessor(this)
+            networkManager.stop()
+        }
     }
 
     override fun removedFromEngine(engine: Engine) {
-        removeInputProcessor(this)
         super.removedFromEngine(engine)
         networkManager.stop()
     }

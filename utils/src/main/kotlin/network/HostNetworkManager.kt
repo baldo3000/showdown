@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.uuid.Uuid
 
 class HostNetworkManager(
-    val port: Int = 0,
     val onPeerConnect: (Uuid) -> Unit = {},
     val onPeerDisconnect: (Uuid) -> Unit = {}
 ) : Host {
@@ -37,7 +36,7 @@ class HostNetworkManager(
     val connectedPeerIds: Set<Uuid>
         get() = connectedPeers.keys
 
-    override fun start() {
+    override fun start(port: Int) {
         runningJobs += scope.launch {
             var tcpServer: ServerSocket? = null
             var udpSocket: BoundDatagramSocket? = null
@@ -95,9 +94,12 @@ class HostNetworkManager(
 
     override fun stop() {
         logger.info { "Stopping host..." }
-        scope.cancel()
+        // scope.cancel()
         runBlocking { runningJobs.joinAll() }
         logger.info { "Host is now stopped" }
+        connectedPeers.clear()
+        tcpOuts.clear()
+        runningJobs.clear()
     }
 
     private fun handleNewConnection(socket: Socket) {

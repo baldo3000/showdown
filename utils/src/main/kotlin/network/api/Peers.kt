@@ -8,7 +8,7 @@ data class ConnectedPeer(
 )
 
 interface Host {
-    fun start()
+    fun start(port: Int = 0)
 
     fun sendToClients(payload: ByteArray)
 

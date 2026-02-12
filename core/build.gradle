@@ -13,6 +13,7 @@ kotlin {
 
 dependencies {
   api libs.ashley
+  api libs.ktx.actors
   api libs.gdx.core
   api libs.ktx.app
   api libs.ktx.ashley
@@ -22,6 +23,8 @@ dependencies {
   api libs.ktx.json
   api libs.ktx.log
   api libs.ktx.math
+  api libs.ktx.scene2d
+  api libs.ktx.style
   api libs.kotlin.stdlib
   api libs.kotlinx.coroutines
   implementation libs.kotlinx.serialization.json
