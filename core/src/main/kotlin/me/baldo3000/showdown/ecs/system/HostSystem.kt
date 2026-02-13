@@ -85,7 +85,7 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
     }
 
     private fun processPlayerInput(playerInput: PlayerInputPacket) {
-        log.debug { "Processing input packet: $playerInput" }
+        // log.debug { "Processing input packet: $playerInput" }
         val lastSequenceNumber = playerLastInputSequenceNumbers[playerInput.id]
         if (lastSequenceNumber != null) {
             if (playerInput.sequenceNumber > lastSequenceNumber) {
