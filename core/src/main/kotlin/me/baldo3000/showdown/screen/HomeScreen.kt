@@ -1,7 +1,7 @@
 package me.baldo3000.showdown.screen
 
+import com.badlogic.gdx.Gdx
 import ktx.actors.minusAssign
-import ktx.actors.onClick
 import ktx.actors.plusAssign
 import ktx.ashley.getSystem
 import ktx.log.logger
@@ -11,24 +11,18 @@ import me.baldo3000.showdown.ecs.system.HostNetworkSystem
 import me.baldo3000.showdown.ui.HomeUI
 
 class HomeScreen(game: Showdown) : ShowdownScreen(game) {
-    private val ui = HomeUI().apply {
-        hostGameButton.onClick {
+    private val ui = HomeUI(
+        onHost = {
             game.setScreen<GameScreen>()
             engine.run { getSystem<HostNetworkSystem>().setProcessing(true) }
-        }
-
-        clientGameButton.onClick {
+        },
+        onJoin = {
             game.setScreen<GameScreen>()
             engine.run { getSystem<ClientNetworkSystem>().setProcessing(true) }
-        }
-
-        creditsButton.onClick {
-            log.debug { "Credits button clicked" }
-        }
-        quitGameButton.onClick {
-            log.debug { "Quit button clicked" }
-        }
-    }
+        },
+        onCredits = { log.debug { "Credits button clicked" } },
+        onQuit = { Gdx.app.exit() }
+    )
 
     override fun show() {
         super.show()

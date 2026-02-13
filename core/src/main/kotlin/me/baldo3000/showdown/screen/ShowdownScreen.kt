@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.app.KtxScreen
 import me.baldo3000.showdown.Showdown
 
-abstract class ShowdownScreen(game: Showdown) : KtxScreen {
+abstract class ShowdownScreen(val game: Showdown) : KtxScreen {
     val gameViewport: Viewport = game.gameViewport
     val engine: Engine = game.engine
     val stage: Stage = game.stage

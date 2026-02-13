@@ -6,6 +6,7 @@ import ktx.actors.plusAssign
 import ktx.ashley.getSystem
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
+import me.baldo3000.showdown.ecs.reset
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.ui.PauseMenuUI
@@ -16,7 +17,7 @@ private const val MAX_DELTA_TIME = 1 / 20f
 class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private val menuUI = PauseMenuUI(
         onResume = { closeMenu() },
-        onExit = { Gdx.app.exit() }
+        onExit = { returnToMainMenu() }
     )
     private val escProcessor = object : InputAdapter() {
         override fun keyDown(keycode: Int): Boolean {
@@ -76,7 +77,13 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         Gdx.input.inputProcessor = savedInputProcessor
     }
 
+    private fun returnToMainMenu() {
+        disableGameSystems()
+        game.setScreen<HomeScreen>()
+    }
+
     private fun enableGameSystems() {
+        engine.reset()
         engine.run {
             getSystem<CameraSystem>().setProcessing(true)
             getSystem<CollisionSystem>().setProcessing(true)
@@ -89,6 +96,7 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     }
 
     private fun disableGameSystems() {
+        engine.reset()
         engine.run {
             getSystem<CameraSystem>().setProcessing(false)
             getSystem<CollisionSystem>().setProcessing(false)
@@ -98,9 +106,8 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
             getSystem<RemoveSystem>().setProcessing(false)
             getSystem<RenderSystem>().setProcessing(false)
 
-            // keep networking running if needed
-            getSystem<HostNetworkSystem>().setProcessing(true)
-            getSystem<ClientNetworkSystem>().setProcessing(true)
+            getSystem<HostNetworkSystem>().setProcessing(false)
+            getSystem<ClientNetworkSystem>().setProcessing(false)
         }
     }
 

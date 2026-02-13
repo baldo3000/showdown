@@ -2,13 +2,19 @@ package me.baldo3000.showdown.ui
 
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Align
+import ktx.actors.onClick
 import ktx.scene2d.*
 
 private const val OFFSET_TITLE_Y = 15f
 private const val MENU_ELEMENT_OFFSET_TITLE_Y = 20f
 private const val MENU_DEFAULT_PADDING = 2.5f
 
-class HomeUI {
+class HomeUI(
+    private val onHost: () -> Unit = {},
+    private val onJoin: () -> Unit = {},
+    private val onCredits: () -> Unit = {},
+    private val onQuit: () -> Unit = {}
+) {
     val table: KTableWidget
     val hostGameButton: TextButton
     val clientGameButton: TextButton
@@ -44,5 +50,10 @@ class HomeUI {
             top()
             pack()
         }
+
+        hostGameButton.onClick { onHost() }
+        clientGameButton.onClick { onJoin() }
+        creditsButton.onClick { onCredits() }
+        quitGameButton.onClick { onQuit() }
     }
 }
