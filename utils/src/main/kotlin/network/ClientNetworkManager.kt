@@ -96,7 +96,7 @@ class ClientNetworkManager(
     override fun stop() {
         logger.info { "Stopping client..." }
         // scope.cancel()
-        runBlocking { runningJobs.joinAll() }
+        runBlocking { runningJobs.forEach { it.cancelAndJoin() } }
         logger.info { "Client is now stopped" }
         _id.store(null)
     }

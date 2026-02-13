@@ -94,8 +94,8 @@ class HostNetworkManager(
 
     override fun stop() {
         logger.info { "Stopping host..." }
-        // scope.cancel()
-        runBlocking { runningJobs.joinAll() }
+        //scope.cancel()
+        runBlocking { runningJobs.forEach { it.cancelAndJoin() } }
         logger.info { "Host is now stopped" }
         connectedPeers.clear()
         tcpOuts.clear()
