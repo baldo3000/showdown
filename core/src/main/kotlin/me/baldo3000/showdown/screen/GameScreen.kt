@@ -106,8 +106,8 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
             getSystem<RemoveSystem>().setProcessing(false)
             getSystem<RenderSystem>().setProcessing(false)
 
-            getSystem<HostNetworkSystem>().setProcessing(false)
-            getSystem<ClientNetworkSystem>().setProcessing(false)
+            getSystem<HostSystem>().setProcessing(false)
+            getSystem<ClientSystem>().setProcessing(false)
         }
     }
 

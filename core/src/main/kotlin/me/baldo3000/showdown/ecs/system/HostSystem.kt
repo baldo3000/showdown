@@ -16,7 +16,7 @@ import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 30f
 
-class HostNetworkSystem : IntervalSystem(UPDATE_RATE) {
+class HostSystem : IntervalSystem(UPDATE_RATE) {
     private val networkManager: HostNetworkManager
     private var snapshotSequenceNumber = 0
     private val playerLastInputSequenceNumbers = mutableMapOf<Uuid, Int>()
@@ -126,6 +126,6 @@ class HostNetworkSystem : IntervalSystem(UPDATE_RATE) {
     }
 
     companion object {
-        private val log = logger<HostNetworkSystem>()
+        private val log = logger<HostSystem>()
     }
 }

@@ -5,16 +5,11 @@ import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import ktx.app.KtxGame
 import ktx.log.logger
-import ktx.scene2d.Scene2DSkin
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.data.Vector3D
 import me.baldo3000.showdown.ecs.component.*
@@ -52,8 +47,8 @@ class Showdown : KtxGame<ShowdownScreen>() {
             addSystem(CollisionSystem().apply { setProcessing(false) })
             addSystem(CameraSystem(gameViewport).apply { setProcessing(false) })
             addSystem(RenderSystem(stage.batch, gameViewport).apply { setProcessing(false) })
-            addSystem(HostNetworkSystem().apply { setProcessing(false) })
-            addSystem(ClientNetworkSystem(gameViewport).apply { setProcessing(false) })
+            addSystem(HostSystem().apply { setProcessing(false) })
+            addSystem(ClientSystem(gameViewport).apply { setProcessing(false) })
             addSystem(GameEventsSystem(ShowdownWorld()).apply { setProcessing(false) })
             addSystem(RemoveSystem().apply { setProcessing(false) })
         }

@@ -24,7 +24,7 @@ import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 30f
 
-class ClientNetworkSystem(
+class ClientSystem(
     private val gameViewport: Viewport
 ) : IntervalSystem(UPDATE_RATE), DummyInputProcessor {
     private val networkManager: ClientNetworkManager
@@ -200,6 +200,6 @@ class ClientNetworkSystem(
     }
 
     companion object {
-        private val log = logger<ClientNetworkSystem>()
+        private val log = logger<ClientSystem>()
     }
 }
