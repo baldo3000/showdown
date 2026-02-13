@@ -54,17 +54,13 @@ class HostNetworkSystem : IntervalSystem(UPDATE_RATE) {
             engine.spawnWalls()
             networkManager.start(8080)
         } else {
-            networkManager.stop()
+            reset()
         }
-    }
-
-    override fun addedToEngine(engine: Engine?) {
-        super.addedToEngine(engine)
     }
 
     override fun removedFromEngine(engine: Engine?) {
         super.removedFromEngine(engine)
-        networkManager.stop()
+        reset()
     }
 
     override fun updateInterval() {
@@ -121,6 +117,12 @@ class HostNetworkSystem : IntervalSystem(UPDATE_RATE) {
                 log.error { "Discard input packet out of sequence" }
             }
         }
+    }
+
+    private fun reset() {
+        networkManager.stop()
+        snapshotSequenceNumber = 0
+        playerLastInputSequenceNumbers.clear()
     }
 
     companion object {

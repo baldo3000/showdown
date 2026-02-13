@@ -14,9 +14,6 @@ import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.ecs.createWall
-import me.baldo3000.showdown.ecs.reset
-import me.baldo3000.showdown.ecs.spawnPlayer
-import me.baldo3000.showdown.ecs.spawnWalls
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.input.removeInputProcessor
@@ -53,14 +50,13 @@ class ClientNetworkSystem(
             addInputProcessor(this)
             networkManager.connect("127.0.0.1", 8080)
         } else {
-            removeInputProcessor(this)
-            networkManager.stop()
+            reset()
         }
     }
 
     override fun removedFromEngine(engine: Engine) {
         super.removedFromEngine(engine)
-        networkManager.stop()
+        reset()
     }
 
     override fun updateInterval() {
@@ -75,7 +71,7 @@ class ClientNetworkSystem(
 
         if (latestPacket != null) {
             val worldState = Json.decodeFromString<WorldSnapshot>(latestPacket.decodeToString())
-            // log.debug { "Received world update: $worldState" }
+            //log.debug { "Received world update: $worldState" }
             syncWorld(worldState)
         }
     }
@@ -157,6 +153,14 @@ class ClientNetworkSystem(
                 networkManager.sendToHost(bytes)
             }
         }
+    }
+
+    private fun reset() {
+        idMap.clear()
+        removeInputProcessor(this)
+        networkManager.stop()
+        inputSequenceNumber = 0
+        lastSnapshotSequenceNumber = -1
     }
 
     override fun keyDown(keycode: Int): Boolean {
