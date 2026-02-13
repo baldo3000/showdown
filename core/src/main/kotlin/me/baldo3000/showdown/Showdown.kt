@@ -21,7 +21,6 @@ import me.baldo3000.showdown.network.BulletSnapshot
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.PlayerSnapshot
 import me.baldo3000.showdown.network.WorldSnapshot
-import me.baldo3000.showdown.screen.GameEndScreen
 import me.baldo3000.showdown.screen.GameScreen
 import me.baldo3000.showdown.screen.HomeScreen
 import me.baldo3000.showdown.screen.ShowdownScreen
@@ -62,7 +61,6 @@ class Showdown : KtxGame<ShowdownScreen>() {
         log.debug { "Game instance created" }
         addScreen(HomeScreen(this))
         addScreen(GameScreen(this))
-        addScreen(GameEndScreen(this))
         setScreen<HomeScreen>()
     }
 

@@ -9,6 +9,7 @@ import me.baldo3000.showdown.Showdown
 import me.baldo3000.showdown.ecs.reset
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.input.addInputProcessor
+import me.baldo3000.showdown.ui.GameEndUI
 import me.baldo3000.showdown.ui.PauseMenuUI
 import kotlin.math.min
 
@@ -18,6 +19,9 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private val menuUI = PauseMenuUI(
         onResume = { closeMenu() },
         onExit = { returnToMainMenu() }
+    )
+    private val gameEndUI = GameEndUI(
+        onClose = { returnToMainMenu() }
     )
     private val escProcessor = object : InputAdapter() {
         override fun keyDown(keycode: Int): Boolean {
@@ -29,11 +33,12 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         }
     }
     private var menuVisible = false
+    private var endVisible = false
     private var savedInputProcessor: InputProcessor? = null
 
     init {
         engine.run {
-            getSystem<GameEventsSystem>().apply { onGameEnd = ::gameEndScreen }
+            getSystem<GameEventsSystem>().apply { onGameEnd = ::openEnd }
         }
     }
 
@@ -48,13 +53,14 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     override fun hide() {
         super.hide()
         closeMenu()
+        closeEnd()
         disableGameSystems()
     }
 
     override fun render(delta: Float) {
         engine.update(min(delta, MAX_DELTA_TIME))
 
-        if (menuVisible) {
+        if (menuVisible || endVisible) {
             stage.viewport.apply()
             stage.run {
                 act(min(delta, MAX_DELTA_TIME))
@@ -83,10 +89,22 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         Gdx.input.inputProcessor = savedInputProcessor
     }
 
-    private fun gameEndScreen(placement: Int) {
+    private fun openEnd(placement: Int) {
         closeMenu()
-        game.getScreen<GameEndScreen>().apply { this.placement = placement }
-        game.setScreen<GameEndScreen>()
+        if (endVisible) return
+        endVisible = true
+        gameEndUI.updatePlacement(placement)
+        stage += gameEndUI.table
+        savedInputProcessor = Gdx.input.inputProcessor
+        Gdx.input.inputProcessor = gameEndUI.table.stage
+        engine.getSystem<RenderSystem>().setProcessing(false)
+    }
+
+    private fun closeEnd() {
+        if (!endVisible) return
+        endVisible = false
+        stage -= gameEndUI.table
+        Gdx.input.inputProcessor = savedInputProcessor
     }
 
     private fun returnToMainMenu() {
