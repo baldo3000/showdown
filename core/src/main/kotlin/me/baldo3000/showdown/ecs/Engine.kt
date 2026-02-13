@@ -11,8 +11,8 @@ import ktx.ashley.with
 import me.baldo3000.showdown.UNIT_SCALE
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.component.event.PlayerSpawnComponent
-import me.baldo3000.showdown.ecs.component.event.WallsSpawnComponent
+import me.baldo3000.showdown.ecs.component.event.PlayerJoinComponent
+import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
 import me.baldo3000.showdown.ui.Textures
 import me.baldo3000.showdown.world.ShowdownWorld
 import kotlin.uuid.Uuid
@@ -182,7 +182,7 @@ fun Engine.reset() {
 
 fun Engine.spawnPlayer(playerId: Uuid, controllable: Boolean) {
     entity {
-        with<PlayerSpawnComponent> {
+        with<PlayerJoinComponent> {
             this.playerId = playerId
             this.controllable = controllable
         }
@@ -190,5 +190,5 @@ fun Engine.spawnPlayer(playerId: Uuid, controllable: Boolean) {
 }
 
 fun Engine.spawnWalls() {
-    entity { with<WallsSpawnComponent>() }
+    entity { with<SetupGameComponent>() }
 }

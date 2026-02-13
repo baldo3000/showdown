@@ -2,10 +2,10 @@ package me.baldo3000.showdown.ecs.component.event
 
 import ktx.ashley.mapperFor
 
-class WallsSpawnComponent : EventComponent {
+class SetupGameComponent : EventComponent {
     override fun reset() {}
 
     companion object {
-        val mapper = mapperFor<WallsSpawnComponent>()
+        val mapper = mapperFor<SetupGameComponent>()
     }
 }

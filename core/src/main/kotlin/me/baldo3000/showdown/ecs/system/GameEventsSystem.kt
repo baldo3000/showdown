@@ -10,8 +10,8 @@ import me.baldo3000.showdown.ecs.character
 import me.baldo3000.showdown.ecs.component.RemoveComponent
 import me.baldo3000.showdown.ecs.component.event.EventComponent
 import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
-import me.baldo3000.showdown.ecs.component.event.PlayerSpawnComponent
-import me.baldo3000.showdown.ecs.component.event.WallsSpawnComponent
+import me.baldo3000.showdown.ecs.component.event.PlayerJoinComponent
+import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.ecs.spawnWallsFromWorld
@@ -20,8 +20,8 @@ import me.baldo3000.showdown.world.ShowdownWorld
 class GameEventsSystem : IteratingSystem(
     oneOf(
         PlayerDeathComponent::class,
-        PlayerSpawnComponent::class,
-        WallsSpawnComponent::class
+        PlayerJoinComponent::class,
+        SetupGameComponent::class
     ).exclude(RemoveComponent::class).get()
 ) {
     var world: ShowdownWorld = ShowdownWorld()
@@ -34,8 +34,8 @@ class GameEventsSystem : IteratingSystem(
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val event: EventComponent = entity[PlayerDeathComponent.mapper]
-            ?: entity[PlayerSpawnComponent.mapper]
-            ?: entity[WallsSpawnComponent.mapper]
+            ?: entity[PlayerJoinComponent.mapper]
+            ?: entity[SetupGameComponent.mapper]
             ?: throw IllegalArgumentException("Entity must be an event")
 
         processEvent(event)
@@ -52,12 +52,12 @@ class GameEventsSystem : IteratingSystem(
                 }
             }
 
-            is PlayerSpawnComponent -> processPlayerSpawnEvent(event)
-            is WallsSpawnComponent -> spawnWalls()
+            is PlayerJoinComponent -> processPlayerJoinEvent(event)
+            is SetupGameComponent -> spawnWalls()
         }
     }
 
-    private fun processPlayerSpawnEvent(event: PlayerSpawnComponent) {
+    private fun processPlayerJoinEvent(event: PlayerJoinComponent) {
         if (!world.isGameFull()) {
             val spawnLocation = world.newPlayerSpawnLocation()
             engine.createPlayer(event.playerId, spawnLocation, event.controllable)

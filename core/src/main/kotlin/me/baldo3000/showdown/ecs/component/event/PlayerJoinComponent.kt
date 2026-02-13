@@ -3,7 +3,7 @@ package me.baldo3000.showdown.ecs.component.event
 import ktx.ashley.mapperFor
 import kotlin.uuid.Uuid
 
-class PlayerSpawnComponent : EventComponent {
+class PlayerJoinComponent : EventComponent {
     var playerId: Uuid = Uuid.random()
     var controllable: Boolean = false
 
@@ -13,6 +13,6 @@ class PlayerSpawnComponent : EventComponent {
     }
 
     companion object {
-        val mapper = mapperFor<PlayerSpawnComponent>()
+        val mapper = mapperFor<PlayerJoinComponent>()
     }
 }
