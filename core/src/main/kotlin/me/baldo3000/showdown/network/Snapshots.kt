@@ -75,6 +75,7 @@ data class WorldSnapshot(
     val players: List<PlayerSnapshot>,
     val bullets: List<BulletSnapshot>,
     val walls: List<WallSnapshot>,
+    val sessionId: Uuid,
     val sequenceNumber: Int = 0
 ) {
     companion object {
@@ -82,12 +83,14 @@ data class WorldSnapshot(
             players: List<Entity>,
             bullets: List<Entity>,
             walls: List<Entity>,
+            sessionId: Uuid,
             sequenceNumber: Int
         ): WorldSnapshot =
             WorldSnapshot(
                 players.map { PlayerSnapshot.fromEntity(it) },
                 bullets.map { BulletSnapshot.fromEntity(it) },
                 walls.map { WallSnapshot.fromEntity(it) },
+                sessionId,
                 sequenceNumber
             )
     }

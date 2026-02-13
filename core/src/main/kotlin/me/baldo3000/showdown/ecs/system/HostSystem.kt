@@ -19,6 +19,8 @@ private const val UPDATE_RATE = 1 / 30f
 class HostSystem : IntervalSystem(UPDATE_RATE) {
     private val networkManager: HostNetworkManager
     private var snapshotSequenceNumber = 0
+    private var sessionId: Uuid = Uuid.random()
+
     private val playerLastInputSequenceNumbers = mutableMapOf<Uuid, Int>()
 
     private val speedVector = Vector2D()
@@ -49,6 +51,9 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
     override fun setProcessing(processing: Boolean) {
         super.setProcessing(processing)
         if (processing) {
+            snapshotSequenceNumber = 0
+            playerLastInputSequenceNumbers.clear()
+            sessionId = Uuid.random()
             engine.reset()
             engine.spawnPlayer(Uuid.random(), true)
             engine.spawnWalls()
@@ -71,7 +76,13 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
     private fun broadcastWorldState() {
         // log.debug { "Sending broadcast update: $worldSnapshot" }
         val worldSnapshot =
-            WorldSnapshot.fromEntities(engine.players, engine.bullets, engine.walls, snapshotSequenceNumber++)
+            WorldSnapshot.fromEntities(
+                engine.players,
+                engine.bullets,
+                engine.walls,
+                sessionId,
+                snapshotSequenceNumber++
+            )
         val bytes = Json.encodeToString(worldSnapshot).toByteArray()
         networkManager.sendToClients(bytes)
     }
@@ -121,8 +132,6 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
 
     private fun reset() {
         networkManager.stop()
-        snapshotSequenceNumber = 0
-        playerLastInputSequenceNumbers.clear()
     }
 
     companion object {

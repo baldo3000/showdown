@@ -13,8 +13,7 @@ import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.data.Vector3D
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.component.event.DefeatComponent
-import me.baldo3000.showdown.ecs.component.event.VictoryComponent
+import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.network.BulletSnapshot
@@ -86,9 +85,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
         MoveComponent.mapper
         RemoveComponent.mapper
         TransformComponent.mapper
-
-        VictoryComponent.mapper
-        DefeatComponent.mapper
+        PlayerDeathComponent.mapper
     }
 
     private fun loadSerializers() {

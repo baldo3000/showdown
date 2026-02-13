@@ -2,10 +2,10 @@ package me.baldo3000.showdown.ecs.component.event
 
 import ktx.ashley.mapperFor
 
-class DefeatComponent : EventComponent {
+class PlayerDeathComponent : EventComponent {
     override fun reset() {}
 
     companion object {
-        val mapper = mapperFor<DefeatComponent>()
+        val mapper = mapperFor<PlayerDeathComponent>()
     }
 }

@@ -7,10 +7,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.viewport.Viewport
 import kotlinx.serialization.json.Json
+import ktx.ashley.entity
 import ktx.ashley.get
+import ktx.ashley.with
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.ecs.createWall
@@ -31,6 +34,7 @@ class ClientSystem(
     private val idMap = mutableMapOf<Uuid, Entity>()
     private var inputSequenceNumber = 0
     private var lastSnapshotSequenceNumber = -1
+    private var currentSessionId: Uuid? = null
     private var connected = false
     private var playerEntity: Entity? = null
 
@@ -77,12 +81,25 @@ class ClientSystem(
     }
 
     private fun syncWorld(state: WorldSnapshot) {
+        if (state.sessionId != currentSessionId) {
+            currentSessionId = state.sessionId
+            inputSequenceNumber = 0
+            lastSnapshotSequenceNumber = -1
+            idMap.clear()
+            for (entity in engine.entities) {
+                entity.add(RemoveComponent())
+            }
+        }
+
         if (state.sequenceNumber > lastSnapshotSequenceNumber) {
             lastSnapshotSequenceNumber = state.sequenceNumber
             val serverIds = state.players.map { it.id } + state.bullets.map { it.id } + state.walls.map { it.id }
             for (entity in engine.entities) {
                 val id = entity[IdComponent.mapper]?.id
                 if (id !in serverIds) {
+                    if (entity[HealthComponent.mapper] != null) {
+                        engine.entity { with<PlayerDeathComponent>() }
+                    }
                     entity.add(RemoveComponent())
                     idMap.remove(id)
                 }
@@ -134,7 +151,7 @@ class ClientSystem(
                 }
             }
         } else {
-            log.error { "Discard input packet out of sequence" }
+            log.error { "Discard input packet out of sequence: ${state.sequenceNumber}, $lastSnapshotSequenceNumber" }
         }
     }
 
@@ -159,8 +176,6 @@ class ClientSystem(
         idMap.clear()
         removeInputProcessor(this)
         networkManager.stop()
-        inputSequenceNumber = 0
-        lastSnapshotSequenceNumber = -1
     }
 
     override fun keyDown(keycode: Int): Boolean {

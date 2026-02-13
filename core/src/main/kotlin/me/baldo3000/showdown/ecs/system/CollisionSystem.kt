@@ -10,11 +10,8 @@ import ktx.ashley.*
 import ktx.log.logger
 import ktx.math.minusAssign
 import ktx.math.times
-import me.baldo3000.showdown.ecs.character
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.component.event.DefeatComponent
-import me.baldo3000.showdown.ecs.component.event.VictoryComponent
-import me.baldo3000.showdown.ecs.players
+import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
 
 private const val UPDATE_RATE = 1 / 60f
 
@@ -64,11 +61,7 @@ class CollisionSystem :
                             otherHealth?.apply {
                                 health -= damage.damage
                                 if (health <= 0f) {
-                                    if (other == engine.character) {
-                                        engine.entity { with<DefeatComponent>() }
-                                    } else if (engine.players.size == 2) {
-                                        engine.entity { with<VictoryComponent>() }
-                                    }
+                                    engine.entity { with<PlayerDeathComponent>() }
                                     other.add(RemoveComponent())
                                 }
                             }

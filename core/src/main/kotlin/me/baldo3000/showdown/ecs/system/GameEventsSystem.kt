@@ -6,8 +6,12 @@ import ktx.ashley.exclude
 import ktx.ashley.get
 import ktx.ashley.oneOf
 import ktx.log.logger
+import me.baldo3000.showdown.ecs.character
 import me.baldo3000.showdown.ecs.component.RemoveComponent
-import me.baldo3000.showdown.ecs.component.event.*
+import me.baldo3000.showdown.ecs.component.event.EventComponent
+import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
+import me.baldo3000.showdown.ecs.component.event.PlayerSpawnComponent
+import me.baldo3000.showdown.ecs.component.event.WallsSpawnComponent
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.ecs.spawnWallsFromWorld
@@ -15,8 +19,7 @@ import me.baldo3000.showdown.world.ShowdownWorld
 
 class GameEventsSystem : IteratingSystem(
     oneOf(
-        DefeatComponent::class,
-        VictoryComponent::class,
+        PlayerDeathComponent::class,
         PlayerSpawnComponent::class,
         WallsSpawnComponent::class
     ).exclude(RemoveComponent::class).get()
@@ -30,8 +33,7 @@ class GameEventsSystem : IteratingSystem(
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
-        val event: EventComponent = entity[DefeatComponent.mapper]
-            ?: entity[VictoryComponent.mapper]
+        val event: EventComponent = entity[PlayerDeathComponent.mapper]
             ?: entity[PlayerSpawnComponent.mapper]
             ?: entity[WallsSpawnComponent.mapper]
             ?: throw IllegalArgumentException("Entity must be an event")
@@ -42,14 +44,12 @@ class GameEventsSystem : IteratingSystem(
 
     private fun processEvent(event: EventComponent) {
         when (event) {
-            is DefeatComponent -> {
-                log.debug { "Defeat!" }
-                onGameEnd(engine.players.size + 1)
-            }
-
-            is VictoryComponent -> {
-                log.debug { "Victory!" }
-                onGameEnd(1)
+            is PlayerDeathComponent -> {
+                if (engine.character == null) {
+                    onGameEnd(engine.players.size + 1)
+                } else if (engine.players.size == 1) {
+                    onGameEnd(1)
+                }
             }
 
             is PlayerSpawnComponent -> processPlayerSpawnEvent(event)
