@@ -9,10 +9,11 @@ import ktx.log.logger
 import me.baldo3000.showdown.ecs.component.RemoveComponent
 import me.baldo3000.showdown.ecs.component.event.*
 import me.baldo3000.showdown.ecs.createPlayer
+import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.ecs.spawnWallsFromWorld
 import me.baldo3000.showdown.world.ShowdownWorld
 
-class GameEventsSystem(private val world: ShowdownWorld) : IteratingSystem(
+class GameEventsSystem : IteratingSystem(
     oneOf(
         DefeatComponent::class,
         VictoryComponent::class,
@@ -20,6 +21,9 @@ class GameEventsSystem(private val world: ShowdownWorld) : IteratingSystem(
         WallsSpawnComponent::class
     ).exclude(RemoveComponent::class).get()
 ) {
+    var world: ShowdownWorld = ShowdownWorld()
+    var onGameEnd: (placement: Int) -> Unit = {}
+
     override fun setProcessing(processing: Boolean) {
         super.setProcessing(processing)
         if (!processing) world.reset()
@@ -38,8 +42,16 @@ class GameEventsSystem(private val world: ShowdownWorld) : IteratingSystem(
 
     private fun processEvent(event: EventComponent) {
         when (event) {
-            is DefeatComponent -> log.info { "Game lost!" }
-            is VictoryComponent -> log.info { "Game won!" }
+            is DefeatComponent -> {
+                log.debug { "Defeat!" }
+                onGameEnd(engine.players.size + 1)
+            }
+
+            is VictoryComponent -> {
+                log.debug { "Victory!" }
+                onGameEnd(1)
+            }
+
             is PlayerSpawnComponent -> processPlayerSpawnEvent(event)
             is WallsSpawnComponent -> spawnWalls()
         }

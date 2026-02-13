@@ -21,12 +21,12 @@ import me.baldo3000.showdown.network.BulletSnapshot
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.PlayerSnapshot
 import me.baldo3000.showdown.network.WorldSnapshot
+import me.baldo3000.showdown.screen.GameEndScreen
 import me.baldo3000.showdown.screen.GameScreen
 import me.baldo3000.showdown.screen.HomeScreen
 import me.baldo3000.showdown.screen.ShowdownScreen
 import me.baldo3000.showdown.ui.Textures
 import me.baldo3000.showdown.ui.createSkin
-import me.baldo3000.showdown.world.ShowdownWorld
 
 const val V_WIDTH = 16
 const val V_HEIGHT = 9
@@ -49,7 +49,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
             addSystem(RenderSystem(stage.batch, gameViewport).apply { setProcessing(false) })
             addSystem(HostSystem().apply { setProcessing(false) })
             addSystem(ClientSystem(gameViewport).apply { setProcessing(false) })
-            addSystem(GameEventsSystem(ShowdownWorld()).apply { setProcessing(false) })
+            addSystem(GameEventsSystem().apply { setProcessing(false) })
             addSystem(RemoveSystem().apply { setProcessing(false) })
         }
     }
@@ -62,6 +62,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
         log.debug { "Game instance created" }
         addScreen(HomeScreen(this))
         addScreen(GameScreen(this))
+        addScreen(GameEndScreen(this))
         setScreen<HomeScreen>()
     }
 

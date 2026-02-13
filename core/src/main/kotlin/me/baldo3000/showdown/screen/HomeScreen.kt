@@ -27,25 +27,13 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
     override fun show() {
         super.show()
         log.debug { "HomeScreen is shown" }
-        setupUI()
+        stage += ui.table
     }
 
     override fun hide() {
         super.hide()
         log.debug { "HomeScreen is hidden" }
-        teardownUI()
-    }
-
-    private fun setupUI() {
-        ui.run {
-            stage += this.table
-        }
-    }
-
-    private fun teardownUI() {
-        ui.run {
-            stage -= this.table
-        }
+        stage -= ui.table
     }
 
     override fun render(delta: Float) {

@@ -31,6 +31,12 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private var menuVisible = false
     private var savedInputProcessor: InputProcessor? = null
 
+    init {
+        engine.run {
+            getSystem<GameEventsSystem>().apply { onGameEnd = ::gameEndScreen }
+        }
+    }
+
     override fun show() {
         super.show()
         log.debug { "GameScreen is shown" }
@@ -77,8 +83,13 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         Gdx.input.inputProcessor = savedInputProcessor
     }
 
+    private fun gameEndScreen(placement: Int) {
+        closeMenu()
+        game.getScreen<GameEndScreen>().apply { this.placement = placement }
+        game.setScreen<GameEndScreen>()
+    }
+
     private fun returnToMainMenu() {
-        disableGameSystems()
         game.setScreen<HomeScreen>()
     }
 

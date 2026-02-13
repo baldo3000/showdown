@@ -12,8 +12,8 @@ class PauseMenuUI(
     private val onExit: () -> Unit
 ) {
     val table: KTableWidget
-    val resumeButton: TextButton
-    val exitButton: TextButton
+    private val resumeButton: TextButton
+    private val exitButton: TextButton
 
     init {
         table = scene2d.table {

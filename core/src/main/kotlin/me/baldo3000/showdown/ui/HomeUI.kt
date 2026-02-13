@@ -16,10 +16,10 @@ class HomeUI(
     private val onQuit: () -> Unit = {}
 ) {
     val table: KTableWidget
-    val hostGameButton: TextButton
-    val clientGameButton: TextButton
-    val creditsButton: TextButton
-    val quitGameButton: TextButton
+    private val hostGameButton: TextButton
+    private val clientGameButton: TextButton
+    private val creditsButton: TextButton
+    private val quitGameButton: TextButton
 
     init {
         table = scene2d.table {
