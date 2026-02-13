@@ -6,4 +6,6 @@ interface World {
     fun isGameFull(): Boolean
 
     fun newPlayerSpawnLocation(): Vector2D
+
+    fun reset()
 }

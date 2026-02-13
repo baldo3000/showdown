@@ -20,6 +20,11 @@ class GameEventsSystem(private val world: ShowdownWorld) : IteratingSystem(
         WallsSpawnComponent::class
     ).exclude(RemoveComponent::class).get()
 ) {
+    override fun setProcessing(processing: Boolean) {
+        super.setProcessing(processing)
+        if (!processing) world.reset()
+    }
+
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val event: EventComponent = entity[DefeatComponent.mapper]
             ?: entity[VictoryComponent.mapper]
