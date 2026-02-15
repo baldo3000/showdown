@@ -14,7 +14,11 @@ import me.baldo3000.showdown.network.api.Address
 import me.baldo3000.showdown.network.api.ConnectedPeer
 import me.baldo3000.showdown.network.api.Host
 import me.baldo3000.showdown.network.api.toAddress
+import java.net.Inet4Address
+import java.net.NetworkInterface
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.concurrent.atomics.AtomicReference
 import kotlin.uuid.Uuid
 
 class HostNetworkManager(
@@ -32,6 +36,10 @@ class HostNetworkManager(
     private val _receiveChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val receiveChannel: ReceiveChannel<ByteArray> = _receiveChannel
 
+    private val _address = AtomicReference<Address?>(null)
+    val address: Address?
+        get() = _address.load()
+
     val connectedPeerIds: Set<Uuid>
         get() = connectedPeers.keys
 
@@ -43,7 +51,10 @@ class HostNetworkManager(
                 tcpServer = aSocket(selector).tcp().bind("0.0.0.0", port)
                 udpSocket = aSocket(selector).udp().bind("0.0.0.0", port)
 
-                log.info { "Host is listening on ${tcpServer.localAddress}" }
+                // log.info { "Host is listening on ${tcpServer.localAddress}" }
+                val actualAddress = Address(localIpv4Addresses(), port)
+                log.info { "Host is listening on address $actualAddress" }
+                _address.store(actualAddress)
 
                 // UDP Listener
                 launch {
@@ -99,6 +110,7 @@ class HostNetworkManager(
         connectedPeers.clear()
         tcpOuts.clear()
         runningJobs.clear()
+        _address.store(null)
     }
 
     private fun handleNewConnection(socket: Socket) {
@@ -135,6 +147,30 @@ class HostNetworkManager(
                 socket.close()
             }
         }
+    }
+
+    private fun localIpv4Addresses(): String {
+        val skipKeywords = listOf("vEthernet", "WSL", "Hyper-V")
+
+        fun ifaceAllowed(netIf: NetworkInterface): Boolean {
+            val name = netIf.name ?: ""
+            val disp = netIf.displayName ?: ""
+            return skipKeywords.none { kw ->
+                name.contains(kw, ignoreCase = true) || disp.contains(
+                    kw,
+                    ignoreCase = true
+                )
+            }
+        }
+
+        return Collections.list(NetworkInterface.getNetworkInterfaces())
+            .asSequence()
+            .filter { it.isUp && ifaceAllowed(it) && !it.isLoopback }
+            .flatMap { Collections.list(it.inetAddresses).asSequence() }
+            .filterIsInstance<Inet4Address>()
+            .filter { !it.isLinkLocalAddress && !it.isLoopbackAddress }
+            .map { it.hostAddress }
+            .toList().first()
     }
 
     companion object {
