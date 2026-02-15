@@ -54,4 +54,8 @@ class GameEndUI(
     fun setDisconnected() {
         titleLabel.setText("You have been disconnected from the host.")
     }
+
+    fun setConnectionFailed() {
+        titleLabel.setText("Couldn't connect to host.")
+    }
 }

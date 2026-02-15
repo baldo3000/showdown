@@ -49,6 +49,9 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         engine.run {
             getSystem<GameEventsSystem>().apply {
                 onGameEnd = ::openEnd
+            }
+            getSystem<ClientSystem>().apply {
+                onConnectionFailure = ::openConnectionFailed
                 onDisconnect = ::openDisconnect
             }
         }
@@ -117,6 +120,17 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         if (endVisible) return
         endVisible = true
         gameEndUI.setDisconnected()
+        stage += gameEndUI.table
+        savedInputProcessor = Gdx.input.inputProcessor
+        Gdx.input.inputProcessor = gameEndUI.table.stage
+        engine.getSystem<RenderSystem>().setProcessing(false)
+    }
+
+    private fun openConnectionFailed() {
+        closeMenu()
+        if (endVisible) return
+        endVisible = true
+        gameEndUI.setConnectionFailed()
         stage += gameEndUI.table
         savedInputProcessor = Gdx.input.inputProcessor
         Gdx.input.inputProcessor = gameEndUI.table.stage

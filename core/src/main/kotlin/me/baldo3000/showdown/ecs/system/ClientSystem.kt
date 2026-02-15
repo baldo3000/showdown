@@ -13,7 +13,6 @@ import ktx.ashley.with
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.component.event.DisconnectedComponent
 import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
@@ -45,10 +44,16 @@ class ClientSystem(
     private var horizontal = 0
     private var vertical = 0
 
+    var onConnectionFailure: () -> Unit = {}
+    var onDisconnect: () -> Unit = {}
+
     init {
-        networkManager = ClientNetworkManager(onConnect = {
-            Gdx.app.postRunnable { connected = true }
-        })
+        Gdx.app.postRunnable { connected = true }
+        networkManager = ClientNetworkManager(
+            onConnect = {},
+            onConnectionFailure = { Gdx.app.postRunnable { onConnectionFailure() } },
+            onDisconnect = { Gdx.app.postRunnable { onDisconnect() } }
+        )
     }
 
     override fun setProcessing(processing: Boolean) {
@@ -67,11 +72,7 @@ class ClientSystem(
     }
 
     override fun updateInterval() {
-        if (networkManager.connected) {
-            processIncomingMessages()
-        } else {
-            engine.entity { with<DisconnectedComponent>() }
-        }
+        processIncomingMessages()
     }
 
     private fun processIncomingMessages() {

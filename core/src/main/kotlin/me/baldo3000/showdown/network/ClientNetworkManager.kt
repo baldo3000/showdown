@@ -12,11 +12,13 @@ import kotlinx.io.EOFException
 import kotlinx.io.readByteArray
 import ktx.log.logger
 import me.baldo3000.showdown.network.api.Client
+import java.net.ConnectException
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.uuid.Uuid
 
 class ClientNetworkManager(
     val onConnect: (Uuid) -> Unit = {},
+    val onConnectionFailure: () -> Unit = {},
     val onDisconnect: () -> Unit = {}
 ) : Client {
     private val selector = SelectorManager(Dispatchers.IO)
@@ -30,9 +32,6 @@ class ClientNetworkManager(
     private val _id = AtomicReference<Uuid?>(null)
     val id: Uuid?
         get() = _id.load()
-
-    var connected = true
-        private set
 
     override fun connect(hostIp: String, port: Int) {
         runningJobs += scope.launch {
@@ -54,7 +53,7 @@ class ClientNetworkManager(
                 _id.store(id)
                 onConnect(id)
                 log.debug { "Received id from host: $id" }
-                connected = true
+
                 // UDP Listener
                 launch {
                     while (isActive) {
@@ -77,13 +76,16 @@ class ClientNetworkManager(
                 // Wait for Host to close connection
                 tcpIn.readByte()
             } catch (_: ClosedByteChannelException) {
+            } catch (_: ConnectException) {
+                log.info { "Couldn't connect to the host" }
+                onConnectionFailure()
             } catch (_: EOFException) {
                 log.info { "Connection closed from host" }
+                onDisconnect()
             } finally {
                 log.debug { "Closing sockets..." }
                 tcpSocket?.close()
                 udpSocket?.close()
-                connected = false
                 log.debug { "Sockets closed" }
             }
         }

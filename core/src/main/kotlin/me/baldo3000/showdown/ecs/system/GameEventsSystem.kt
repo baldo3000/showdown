@@ -8,7 +8,10 @@ import ktx.ashley.oneOf
 import ktx.log.logger
 import me.baldo3000.showdown.ecs.character
 import me.baldo3000.showdown.ecs.component.RemoveComponent
-import me.baldo3000.showdown.ecs.component.event.*
+import me.baldo3000.showdown.ecs.component.event.EventComponent
+import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
+import me.baldo3000.showdown.ecs.component.event.PlayerJoinComponent
+import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
 import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.ecs.spawnWallsFromWorld
@@ -18,13 +21,11 @@ class GameEventsSystem : IteratingSystem(
     oneOf(
         PlayerDeathComponent::class,
         PlayerJoinComponent::class,
-        SetupGameComponent::class,
-        DisconnectedComponent::class
+        SetupGameComponent::class
     ).exclude(RemoveComponent::class).get()
 ) {
     var world: ShowdownWorld = ShowdownWorld()
     var onGameEnd: (placement: Int) -> Unit = {}
-    var onDisconnect: () -> Unit = {}
 
     override fun setProcessing(processing: Boolean) {
         super.setProcessing(processing)
@@ -35,7 +36,6 @@ class GameEventsSystem : IteratingSystem(
         val event: EventComponent = entity[PlayerDeathComponent.mapper]
             ?: entity[PlayerJoinComponent.mapper]
             ?: entity[SetupGameComponent.mapper]
-            ?: entity[DisconnectedComponent.mapper]
             ?: throw IllegalArgumentException("Entity must be an event")
 
         processEvent(event)
@@ -54,7 +54,6 @@ class GameEventsSystem : IteratingSystem(
 
             is PlayerJoinComponent -> processPlayerJoinEvent(event)
             is SetupGameComponent -> spawnWalls()
-            is DisconnectedComponent -> onDisconnect()
         }
     }
 
