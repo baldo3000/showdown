@@ -4,15 +4,13 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.math.Circle
 import com.badlogic.gdx.math.Rectangle
-import ktx.ashley.allOf
-import ktx.ashley.entity
-import ktx.ashley.exclude
-import ktx.ashley.with
+import ktx.ashley.*
 import me.baldo3000.showdown.UNIT_SCALE
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.component.event.PlayerJoinComponent
 import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
+import me.baldo3000.showdown.ecs.system.PlayerInputSystem
 import me.baldo3000.showdown.ui.Textures
 import me.baldo3000.showdown.world.ShowdownWorld
 import kotlin.uuid.Uuid
@@ -192,3 +190,16 @@ fun Engine.spawnPlayer(playerId: Uuid, controllable: Boolean) {
 fun Engine.spawnWalls() {
     entity { with<SetupGameComponent>() }
 }
+
+var Engine.processingInput: Boolean
+    get() = try {
+        getSystem<PlayerInputSystem>().inputEnabled
+    } catch (_: MissingEntitySystemException) {
+        false
+    }
+    set(value) {
+        try {
+            getSystem<PlayerInputSystem>().inputEnabled = value
+        } catch (_: MissingEntitySystemException) {
+        }
+    }

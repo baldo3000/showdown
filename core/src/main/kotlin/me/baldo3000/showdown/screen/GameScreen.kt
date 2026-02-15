@@ -6,6 +6,7 @@ import ktx.actors.plusAssign
 import ktx.ashley.getSystem
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
+import me.baldo3000.showdown.ecs.processingInput
 import me.baldo3000.showdown.ecs.reset
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.input.addInputProcessor
@@ -120,12 +121,12 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private fun startGame() {
         stage -= hostControlUi.table
         hostControlEnabled = false
-        engine.getSystem<PlayerInputSystem>().inputEnabled = true
+        engine.processingInput = true
     }
 
     private fun returnToMainMenu() {
         game.setScreen<HomeScreen>()
-        engine.getSystem<PlayerInputSystem>().inputEnabled = true
+        engine.processingInput = false
     }
 
     private fun enableGameSystems() {
@@ -135,12 +136,12 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
                 Mode.HOST -> {
                     stage += hostControlUi.table
                     hostControlEnabled = true
-                    getSystem<PlayerInputSystem>().inputEnabled = false
+                    processingInput = false
                     getSystem<HostSystem>().setProcessing(true)
                 }
 
                 Mode.CLIENT -> {
-                    getSystem<PlayerInputSystem>().inputEnabled = true
+                    processingInput = true
                     getSystem<ClientSystem>().setProcessing(true)
                 }
             }
@@ -156,11 +157,11 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private fun disableGameSystems() {
         engine.reset()
         engine.run {
+            processingInput = false
             getSystem<CameraSystem>().setProcessing(false)
             getSystem<CollisionSystem>().setProcessing(false)
             getSystem<GameEventsSystem>().setProcessing(false)
             getSystem<MoveSystem>().setProcessing(false)
-            getSystem<PlayerInputSystem>().inputEnabled = false
             getSystem<RemoveSystem>().setProcessing(false)
             getSystem<RenderSystem>().setProcessing(false)
 

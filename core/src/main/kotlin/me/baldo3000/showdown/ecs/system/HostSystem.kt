@@ -5,7 +5,6 @@ import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.Gdx
 import kotlinx.serialization.json.Json
 import ktx.ashley.get
-import ktx.ashley.getSystem
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.*
@@ -97,7 +96,7 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
     }
 
     private fun processPlayerInput(playerInput: PlayerInputPacket) {
-        if (!engine.getSystem<PlayerInputSystem>().inputEnabled) return
+        if (!engine.processingInput) return
         // log.debug { "Processing input packet: $playerInput" }
         val lastSequenceNumber = playerLastInputSequenceNumbers[playerInput.id]
         if (lastSequenceNumber != null) {
