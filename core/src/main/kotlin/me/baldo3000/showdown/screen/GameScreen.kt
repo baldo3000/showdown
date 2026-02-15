@@ -69,6 +69,7 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         super.hide()
         closeMenu()
         closeEnd()
+        closeHostControl()
         disableGameSystems()
     }
 
@@ -144,9 +145,20 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         Gdx.input.inputProcessor = savedInputProcessor
     }
 
-    private fun startGame() {
-        stage -= hostControlUi.table
+    private fun openHostControl() {
+        if (hostControlEnabled) return
+        hostControlEnabled = true
+        stage += hostControlUi.table
+    }
+
+    private fun closeHostControl() {
+        if (!hostControlEnabled) return
         hostControlEnabled = false
+        stage -= hostControlUi.table
+    }
+
+    private fun startGame() {
+        closeHostControl()
         engine.processingInput = true
     }
 
@@ -160,8 +172,7 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         engine.run {
             when (game.networkConfig.mode) {
                 NetworkConfig.Mode.HOST -> {
-                    stage += hostControlUi.table
-                    hostControlEnabled = true
+                    openHostControl()
                     processingInput = false
                     getSystem<HostSystem>().setProcessing(true)
                 }
