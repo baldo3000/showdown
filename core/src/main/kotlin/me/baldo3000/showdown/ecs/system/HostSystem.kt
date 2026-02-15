@@ -9,9 +9,9 @@ import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.*
 import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.network.HostNetworkManager
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
-import me.baldo3000.showdown.network.HostNetworkManager
 import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 30f
@@ -57,7 +57,7 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
             engine.reset()
             engine.spawnPlayer(Uuid.random(), true)
             engine.spawnWalls()
-            networkManager.start(8080)
+            networkManager.start()
         } else {
             reset()
         }

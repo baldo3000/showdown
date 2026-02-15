@@ -9,6 +9,7 @@ import ktx.scene2d.Scene2DSkin
 import ktx.style.label
 import ktx.style.skin
 import ktx.style.textButton
+import ktx.style.textField
 
 fun createSkin() {
     Scene2DSkin.defaultSkin = skin { skin ->
@@ -16,6 +17,7 @@ fun createSkin() {
         createFontStyles()
         createLabelStyles()
         createTextButtonStyles()
+        createTextFieldStyles()
     }
 }
 
@@ -45,5 +47,16 @@ private fun Skin.createTextButtonStyles() {
 private fun Skin.createLabelStyles() {
     label("default") {
         font = getFont("default")
+    }
+}
+
+private fun Skin.createTextFieldStyles() {
+    textField("default") {
+        font = getFont("default")
+        fontColor = Color.WHITE
+        background = newDrawable("background", Color.DARK_GRAY)
+        focusedBackground = newDrawable("background", Color.GRAY)
+        cursor = newDrawable("background", Color.WHITE)
+        selection = newDrawable("background", Color.LIGHT_GRAY)
     }
 }

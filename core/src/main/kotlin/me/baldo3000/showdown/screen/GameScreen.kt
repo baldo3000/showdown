@@ -10,6 +10,7 @@ import me.baldo3000.showdown.ecs.processingInput
 import me.baldo3000.showdown.ecs.reset
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.input.addInputProcessor
+import me.baldo3000.showdown.network.NetworkConfig
 import me.baldo3000.showdown.ui.GameEndUI
 import me.baldo3000.showdown.ui.HostControlUI
 import me.baldo3000.showdown.ui.PauseMenuUI
@@ -18,7 +19,6 @@ import kotlin.math.min
 private const val MAX_DELTA_TIME = 1 / 20f
 
 class GameScreen(game: Showdown) : ShowdownScreen(game) {
-    enum class Mode { HOST, CLIENT }
 
     private val menuUI = PauseMenuUI(
         onResume = { closeMenu() },
@@ -44,8 +44,6 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private var endVisible = false
     private var hostControlEnabled = false
     private var savedInputProcessor: InputProcessor? = null
-
-    var mode: Mode = Mode.HOST
 
     init {
         engine.run {
@@ -132,15 +130,15 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private fun enableGameSystems() {
         engine.reset()
         engine.run {
-            when (mode) {
-                Mode.HOST -> {
+            when (game.networkConfig.mode) {
+                NetworkConfig.Mode.HOST -> {
                     stage += hostControlUi.table
                     hostControlEnabled = true
                     processingInput = false
                     getSystem<HostSystem>().setProcessing(true)
                 }
 
-                Mode.CLIENT -> {
+                NetworkConfig.Mode.CLIENT -> {
                     processingInput = true
                     getSystem<ClientSystem>().setProcessing(true)
                 }

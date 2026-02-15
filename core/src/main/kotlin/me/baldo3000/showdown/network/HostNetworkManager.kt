@@ -52,7 +52,7 @@ class HostNetworkManager(
                 udpSocket = aSocket(selector).udp().bind("0.0.0.0", port)
 
                 // log.info { "Host is listening on ${tcpServer.localAddress}" }
-                val actualAddress = Address(localIpv4Addresses(), port)
+                val actualAddress = Address(localIpv4Addresses(), tcpServer.localAddress.port())
                 log.info { "Host is listening on address $actualAddress" }
                 _address.store(actualAddress)
 

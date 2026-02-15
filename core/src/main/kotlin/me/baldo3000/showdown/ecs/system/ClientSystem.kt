@@ -20,15 +20,17 @@ import me.baldo3000.showdown.ecs.createWall
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.input.removeInputProcessor
+import me.baldo3000.showdown.network.ClientNetworkManager
+import me.baldo3000.showdown.network.NetworkConfig
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
-import me.baldo3000.showdown.network.ClientNetworkManager
 import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 30f
 
 class ClientSystem(
-    private val gameViewport: Viewport
+    private val gameViewport: Viewport,
+    private val networkConfig: NetworkConfig
 ) : IntervalSystem(UPDATE_RATE), DummyInputProcessor {
     private val networkManager: ClientNetworkManager
     private val idMap = mutableMapOf<Uuid, Entity>()
@@ -52,7 +54,7 @@ class ClientSystem(
         super.setProcessing(processing)
         if (processing) {
             addInputProcessor(this)
-            networkManager.connect("127.0.0.1", 8080)
+            networkManager.connect(networkConfig.hostAddress.ip, networkConfig.hostAddress.port)
         } else {
             reset()
         }

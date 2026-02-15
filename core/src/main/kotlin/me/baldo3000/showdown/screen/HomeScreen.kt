@@ -5,16 +5,19 @@ import ktx.actors.minusAssign
 import ktx.actors.plusAssign
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
+import me.baldo3000.showdown.network.NetworkConfig
+import me.baldo3000.showdown.network.api.Address
 import me.baldo3000.showdown.ui.HomeUI
 
 class HomeScreen(game: Showdown) : ShowdownScreen(game) {
     private val ui = HomeUI(
         onHost = {
-            game.getScreen<GameScreen>().mode = GameScreen.Mode.HOST
+            game.networkConfig.mode = NetworkConfig.Mode.HOST
             game.setScreen<GameScreen>()
         },
-        onJoin = {
-            game.getScreen<GameScreen>().mode = GameScreen.Mode.CLIENT
+        onJoin = { ip, port ->
+            game.networkConfig.mode = NetworkConfig.Mode.CLIENT
+            game.networkConfig.hostAddress = Address(ip, port)
             game.setScreen<GameScreen>()
         },
         onCredits = { log.debug { "Credits button clicked" } },
