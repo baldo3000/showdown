@@ -59,6 +59,7 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
             engine.spawnWalls()
             networkManager.start()
         } else {
+            Gdx.graphics.setTitle("Showdown")
             reset()
         }
     }
@@ -69,6 +70,9 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
     }
 
     override fun updateInterval() {
+        Gdx.graphics.setTitle(
+            "Showdown - Host ${networkManager.address?.ip ?: "Unknown Address"}:${networkManager.address?.port ?: "Unknown Port"} - Players: ${networkManager.connectedPeerIds.size}"
+        )
         processIncomingMessages()
         broadcastWorldState()
     }
