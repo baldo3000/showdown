@@ -10,12 +10,15 @@ import me.baldo3000.showdown.ecs.reset
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.ui.GameEndUI
+import me.baldo3000.showdown.ui.HostControlUI
 import me.baldo3000.showdown.ui.PauseMenuUI
 import kotlin.math.min
 
 private const val MAX_DELTA_TIME = 1 / 20f
 
 class GameScreen(game: Showdown) : ShowdownScreen(game) {
+    enum class Mode { HOST, CLIENT }
+
     private val menuUI = PauseMenuUI(
         onResume = { closeMenu() },
         onExit = { returnToMainMenu() }
@@ -23,6 +26,10 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private val gameEndUI = GameEndUI(
         onClose = { returnToMainMenu() }
     )
+    private val hostControlUi = HostControlUI(
+        onStartGame = { startGame() }
+    )
+
     private val escProcessor = object : InputAdapter() {
         override fun keyDown(keycode: Int): Boolean {
             if (keycode == Input.Keys.ESCAPE) {
@@ -34,7 +41,10 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     }
     private var menuVisible = false
     private var endVisible = false
+    private var hostControlEnabled = false
     private var savedInputProcessor: InputProcessor? = null
+
+    var mode: Mode = Mode.HOST
 
     init {
         engine.run {
@@ -60,7 +70,7 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     override fun render(delta: Float) {
         engine.update(min(delta, MAX_DELTA_TIME))
 
-        if (menuVisible || endVisible) {
+        if (menuVisible || endVisible || hostControlEnabled) {
             stage.viewport.apply()
             stage.run {
                 act(min(delta, MAX_DELTA_TIME))
@@ -107,18 +117,37 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         Gdx.input.inputProcessor = savedInputProcessor
     }
 
+    private fun startGame() {
+        stage -= hostControlUi.table
+        hostControlEnabled = false
+        engine.getSystem<PlayerInputSystem>().inputEnabled = true
+    }
+
     private fun returnToMainMenu() {
         game.setScreen<HomeScreen>()
+        engine.getSystem<PlayerInputSystem>().inputEnabled = true
     }
 
     private fun enableGameSystems() {
         engine.reset()
         engine.run {
+            when (mode) {
+                Mode.HOST -> {
+                    stage += hostControlUi.table
+                    hostControlEnabled = true
+                    getSystem<PlayerInputSystem>().inputEnabled = false
+                    getSystem<HostSystem>().setProcessing(true)
+                }
+
+                Mode.CLIENT -> {
+                    getSystem<PlayerInputSystem>().inputEnabled = true
+                    getSystem<ClientSystem>().setProcessing(true)
+                }
+            }
             getSystem<CameraSystem>().setProcessing(true)
             getSystem<CollisionSystem>().setProcessing(true)
             getSystem<GameEventsSystem>().setProcessing(true)
             getSystem<MoveSystem>().setProcessing(true)
-            getSystem<PlayerInputSystem>().inputEnabled = true
             getSystem<RemoveSystem>().setProcessing(true)
             getSystem<RenderSystem>().setProcessing(true)
         }
