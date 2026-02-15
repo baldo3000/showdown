@@ -75,14 +75,10 @@ class ClientNetworkManager(
                 }
 
                 // Wait for Host to close connection
-                try {
-                    tcpIn.readByte()
-                } finally {
-                    log.info { "Connection closed from host" }
-                }
+                tcpIn.readByte()
             } catch (_: ClosedByteChannelException) {
             } catch (_: EOFException) {
-                // Connection closing from host
+                log.info { "Connection closed from host" }
             } finally {
                 log.debug { "Closing sockets..." }
                 tcpSocket?.close()
