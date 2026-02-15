@@ -8,6 +8,7 @@ eclipse.project.name = appName + '-core'
 kotlin {
   compilerOptions {
     optIn.add("kotlin.uuid.ExperimentalUuidApi")
+    optIn.add("kotlin.concurrent.atomics.ExperimentalAtomicApi")
   }
 }
 
@@ -28,7 +29,7 @@ dependencies {
   api libs.kotlin.stdlib
   api libs.kotlinx.coroutines
   implementation libs.kotlinx.serialization.json
-  implementation project(':utils')
+  implementation(libs.ktor.network)
 
   if (enableGraalNative == 'true') {
     implementation libs.graal.helper.annotations

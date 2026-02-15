@@ -1,6 +1,5 @@
-package network
+package me.baldo3000.showdown.network
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
@@ -10,7 +9,8 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.io.readByteArray
-import network.api.Client
+import ktx.log.logger
+import me.baldo3000.showdown.network.api.Client
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.uuid.Uuid
 
@@ -18,7 +18,6 @@ class ClientNetworkManager(
     val onConnect: (Uuid) -> Unit = {},
     val onDisconnect: () -> Unit = {}
 ) : Client {
-    private val logger = KotlinLogging.logger("ClientNetworkManager")
     private val selector = SelectorManager(Dispatchers.IO)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val runningJobs = mutableSetOf<Job>()
@@ -38,19 +37,19 @@ class ClientNetworkManager(
             try {
                 udpSocket = aSocket(selector).udp().bind("0.0.0.0", 0)
                 val localUdpPort = udpSocket.localAddress.port()
-                logger.info { "Client is connected to host" }
+                log.info { "Client is connected to host" }
 
                 tcpSocket = aSocket(selector).tcp().connect(hostIp, port)
                 val tcpOut = tcpSocket.openWriteChannel(autoFlush = true)
                 val tcpIn = tcpSocket.openReadChannel()
-                logger.debug { "Client udp channel is connected to host" }
+                log.debug { "Client udp channel is connected to host" }
 
                 // Handshake
                 tcpOut.writeInt(localUdpPort)
                 val id = Uuid.fromByteArray(tcpIn.readByteArray(16))
                 _id.store(id)
                 onConnect(id)
-                logger.info { "Received id from host: $id" }
+                log.debug { "Received id from host: $id" }
 
                 // UDP Listener
                 launch {
@@ -75,16 +74,16 @@ class ClientNetworkManager(
                 try {
                     tcpIn.readByte()
                 } finally {
-                    logger.info { "Connection closed from host" }
+                    log.info { "Connection closed from host" }
                 }
             } catch (_: ClosedByteChannelException) {
 //            } catch (e: Exception) {
-//                logger.error(e) { "Error during peer related network operation:\n${e.message}" }
+//                log.error(e) { "Error during peer related network operation:\n${e.message}" }
             } finally {
-                logger.debug { "Closing sockets..." }
+                log.debug { "Closing sockets..." }
                 tcpSocket?.close()
                 udpSocket?.close()
-                logger.debug { "Sockets closed" }
+                log.debug { "Sockets closed" }
             }
         }
     }
@@ -94,10 +93,14 @@ class ClientNetworkManager(
     }
 
     override fun stop() {
-        logger.info { "Stopping client..." }
+        log.debug { "Stopping client..." }
         // scope.cancel()
         runBlocking { runningJobs.forEach { it.cancelAndJoin() } }
-        logger.info { "Client is now stopped" }
+        log.debug { "Client is now stopped" }
         _id.store(null)
+    }
+
+    companion object {
+        private val log = logger<ClientNetworkManager>()
     }
 }

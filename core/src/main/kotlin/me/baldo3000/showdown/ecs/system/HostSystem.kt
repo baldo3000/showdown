@@ -11,7 +11,7 @@ import me.baldo3000.showdown.ecs.*
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
-import network.HostNetworkManager
+import me.baldo3000.showdown.network.HostNetworkManager
 import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 30f

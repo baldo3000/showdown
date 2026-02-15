@@ -1,6 +1,5 @@
-package network
+package me.baldo3000.showdown.network
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.network.selector.*
 import io.ktor.network.sockets.*
 import io.ktor.utils.io.*
@@ -10,10 +9,11 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.io.readByteArray
-import network.api.Address
-import network.api.ConnectedPeer
-import network.api.Host
-import network.api.toAddress
+import ktx.log.logger
+import me.baldo3000.showdown.network.api.Address
+import me.baldo3000.showdown.network.api.ConnectedPeer
+import me.baldo3000.showdown.network.api.Host
+import me.baldo3000.showdown.network.api.toAddress
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.uuid.Uuid
 
@@ -21,7 +21,6 @@ class HostNetworkManager(
     val onPeerConnect: (Uuid) -> Unit = {},
     val onPeerDisconnect: (Uuid) -> Unit = {}
 ) : Host {
-    private val logger = KotlinLogging.logger("HostNetworkManager")
     private val selector = SelectorManager(Dispatchers.IO)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val runningJobs = mutableSetOf<Job>()
@@ -44,7 +43,7 @@ class HostNetworkManager(
                 tcpServer = aSocket(selector).tcp().bind("0.0.0.0", port)
                 udpSocket = aSocket(selector).udp().bind("0.0.0.0", port)
 
-                logger.info { "Host is listening on ${tcpServer.localAddress}" }
+                log.info { "Host is listening on ${tcpServer.localAddress}" }
 
                 // UDP Listener
                 launch {
@@ -78,12 +77,12 @@ class HostNetworkManager(
                 }
             } catch (_: ClosedByteChannelException) {
 //            } catch (e: Exception) {
-//                logger.error(e) { "Error during host related network operation:\n${e.message}" }
+//                log.error(e) { "Error during host related network operation:\n${e.message}" }
             } finally {
-                logger.debug { "Closing host sockets..." }
+                log.debug { "Closing host sockets..." }
                 tcpServer?.close()
                 udpSocket?.close()
-                logger.debug { "Host sockets closed" }
+                log.debug { "Host sockets closed" }
             }
         }
     }
@@ -93,10 +92,10 @@ class HostNetworkManager(
     }
 
     override fun stop() {
-        logger.info { "Stopping host..." }
+        log.debug { "Stopping host..." }
         //scope.cancel()
         runBlocking { runningJobs.forEach { it.cancelAndJoin() } }
-        logger.info { "Host is now stopped" }
+        log.debug { "Host is now stopped" }
         connectedPeers.clear()
         tcpOuts.clear()
         runningJobs.clear()
@@ -111,12 +110,12 @@ class HostNetworkManager(
             try {
                 // Handshake: Get their UDP port
                 val udpPort = input.readInt()
-                logger.info { "Received client udp port: $udpPort" }
+                log.debug { "Received client udp port: $udpPort" }
                 output.writeByteArray(peerId.toByteArray())
 
                 val remoteIp = socket.remoteAddress.toAddress()
                 val udpAddress = Address(remoteIp.ip, udpPort)
-                logger.info { "Peer $peerId at $udpAddress connected" }
+                log.info { "Peer $peerId at $udpAddress connected" }
 
                 connectedPeers[peerId] = ConnectedPeer(socket, udpAddress)
                 tcpOuts[peerId] = output
@@ -128,7 +127,7 @@ class HostNetworkManager(
                 }
             } catch (e: Exception) {
                 // Disconnection happening
-                logger.info { "Connection aborted with $peerId at ${connectedPeers[peerId]} connected" }
+                log.info { "Connection aborted with $peerId at ${connectedPeers[peerId]} connected" }
             } finally {
                 onPeerDisconnect(peerId)
                 tcpOuts.remove(peerId)
@@ -136,5 +135,9 @@ class HostNetworkManager(
                 socket.close()
             }
         }
+    }
+
+    companion object {
+        private val log = logger<HostNetworkManager>()
     }
 }

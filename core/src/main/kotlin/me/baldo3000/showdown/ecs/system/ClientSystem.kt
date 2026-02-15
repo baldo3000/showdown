@@ -22,7 +22,7 @@ import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.input.removeInputProcessor
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
-import network.ClientNetworkManager
+import me.baldo3000.showdown.network.ClientNetworkManager
 import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 30f

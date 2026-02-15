@@ -1,4 +1,4 @@
-package network.api
+package me.baldo3000.showdown.network.api
 
 import io.ktor.network.sockets.*
 import io.ktor.util.network.*
