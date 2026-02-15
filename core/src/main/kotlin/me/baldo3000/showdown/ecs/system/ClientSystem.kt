@@ -13,6 +13,7 @@ import ktx.ashley.with
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.ecs.component.event.DisconnectedComponent
 import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
 import me.baldo3000.showdown.ecs.createBullet
 import me.baldo3000.showdown.ecs.createPlayer
@@ -66,7 +67,11 @@ class ClientSystem(
     }
 
     override fun updateInterval() {
-        processIncomingMessages()
+        if (networkManager.connected) {
+            processIncomingMessages()
+        } else {
+            engine.entity { with<DisconnectedComponent>() }
+        }
     }
 
     private fun processIncomingMessages() {

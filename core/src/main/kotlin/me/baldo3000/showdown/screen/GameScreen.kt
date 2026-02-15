@@ -47,7 +47,10 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
 
     init {
         engine.run {
-            getSystem<GameEventsSystem>().apply { onGameEnd = ::openEnd }
+            getSystem<GameEventsSystem>().apply {
+                onGameEnd = ::openEnd
+                onDisconnect = ::openDisconnect
+            }
         }
     }
 
@@ -102,7 +105,18 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
         closeMenu()
         if (endVisible) return
         endVisible = true
-        gameEndUI.updatePlacement(placement)
+        gameEndUI.setPlacement(placement)
+        stage += gameEndUI.table
+        savedInputProcessor = Gdx.input.inputProcessor
+        Gdx.input.inputProcessor = gameEndUI.table.stage
+        engine.getSystem<RenderSystem>().setProcessing(false)
+    }
+
+    private fun openDisconnect() {
+        closeMenu()
+        if (endVisible) return
+        endVisible = true
+        gameEndUI.setDisconnected()
         stage += gameEndUI.table
         savedInputProcessor = Gdx.input.inputProcessor
         Gdx.input.inputProcessor = gameEndUI.table.stage

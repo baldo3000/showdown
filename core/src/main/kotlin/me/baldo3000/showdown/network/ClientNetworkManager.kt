@@ -8,6 +8,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.io.EOFException
 import kotlinx.io.readByteArray
 import ktx.log.logger
 import me.baldo3000.showdown.network.api.Client
@@ -30,6 +31,9 @@ class ClientNetworkManager(
     val id: Uuid?
         get() = _id.load()
 
+    var connected = true
+        private set
+
     override fun connect(hostIp: String, port: Int) {
         runningJobs += scope.launch {
             var tcpSocket: Socket? = null
@@ -50,7 +54,7 @@ class ClientNetworkManager(
                 _id.store(id)
                 onConnect(id)
                 log.debug { "Received id from host: $id" }
-
+                connected = true
                 // UDP Listener
                 launch {
                     while (isActive) {
@@ -77,12 +81,13 @@ class ClientNetworkManager(
                     log.info { "Connection closed from host" }
                 }
             } catch (_: ClosedByteChannelException) {
-//            } catch (e: Exception) {
-//                log.error(e) { "Error during peer related network operation:\n${e.message}" }
+            } catch (_: EOFException) {
+                // Connection closing from host
             } finally {
                 log.debug { "Closing sockets..." }
                 tcpSocket?.close()
                 udpSocket?.close()
+                connected = false
                 log.debug { "Sockets closed" }
             }
         }

@@ -41,7 +41,7 @@ class GameEndUI(
         closeButton.onClick { onClose() }
     }
 
-    fun updatePlacement(placement: Int) {
+    fun setPlacement(placement: Int) {
         val placementText = when (placement) {
             1 -> "1st Place - Victory!"
             2 -> "2nd Place - Defeat!"
@@ -49,5 +49,9 @@ class GameEndUI(
             else -> "${placement}th Place - Defeat!"
         }
         titleLabel.setText(placementText)
+    }
+
+    fun setDisconnected() {
+        titleLabel.setText("You have been disconnected from the host.")
     }
 }
