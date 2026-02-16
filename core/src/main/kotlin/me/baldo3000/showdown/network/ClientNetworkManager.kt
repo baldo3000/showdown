@@ -76,8 +76,10 @@ class ClientNetworkManager(
                 // Wait for Host to close connection
                 tcpIn.readByte()
             } catch (_: ClosedByteChannelException) {
+                log.info { "Connection closed from host" }
+                onDisconnect()
             } catch (_: ConnectException) {
-                log.info { "Couldn't connect to the host" }
+                log.error { "Couldn't connect to the host" }
                 onConnectionFailure()
             } catch (_: EOFException) {
                 log.info { "Connection closed from host" }
