@@ -8,6 +8,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.io.EOFException
 import kotlinx.io.readByteArray
 import ktx.log.logger
 import me.baldo3000.showdown.network.api.Address
@@ -137,9 +138,10 @@ class HostNetworkManager(
                 while (!socket.isClosed) {
                     input.readByte()
                 }
-            } catch (e: Exception) {
-                // Disconnection happening
+            } catch (_: ClosedByteChannelException) { // Client crashes
                 log.info { "Connection aborted with $peerId at ${connectedPeers[peerId]} connected" }
+            } catch (_: EOFException) { // Client disconnects
+                log.info { "Connection closed with $peerId at ${connectedPeers[peerId]} connected" }
             } finally {
                 onPeerDisconnect(peerId)
                 tcpOuts.remove(peerId)
