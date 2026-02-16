@@ -27,7 +27,7 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private val gameEndUI = GameEndUI(
         onClose = { returnToMainMenu() }
     )
-    private val hostControlUi = HostControlUI(
+    private val hostControlUI = HostControlUI(
         onStartGame = { startGame() }
     )
 
@@ -151,13 +151,13 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     private fun openHostControl() {
         if (hostControlEnabled) return
         hostControlEnabled = true
-        stage += hostControlUi.table
+        stage += hostControlUI.table
     }
 
     private fun closeHostControl() {
         if (!hostControlEnabled) return
         hostControlEnabled = false
-        stage -= hostControlUi.table
+        stage -= hostControlUI.table
     }
 
     private fun startGame() {

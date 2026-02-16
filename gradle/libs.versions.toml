@@ -9,9 +9,7 @@ construo = "2.1.0"
 graalBuildTools = "0.11.4"
 foojay = "1.0.0"
 ktor = "3.4.0"
-kotlinLoggingJvm = "7.0.14"
 kotlinSerializationJson = "1.10.0"
-logbackClassic = "1.5.27"
 
 [libraries]
 # GDX Core
@@ -47,8 +45,6 @@ graal-helper-annotations = { module = "io.github.berstanio:gdx-svmhelper-annotat
 graal-helper-backend = { module = "io.github.berstanio:gdx-svmhelper-backend-lwjgl3", version.ref = "graalHelper" }
 
 ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
-kotlin-logging-jvm = { module = "io.github.oshai:kotlin-logging-jvm", version.ref = "kotlinLoggingJvm" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logbackClassic" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
