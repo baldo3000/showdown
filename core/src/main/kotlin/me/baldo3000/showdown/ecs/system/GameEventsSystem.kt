@@ -44,16 +44,17 @@ class GameEventsSystem : IteratingSystem(
 
     private fun processEvent(event: EventComponent) {
         when (event) {
-            is PlayerDeathComponent -> {
-                if (engine.character == null) {
-                    onGameEnd(engine.players.size + 1)
-                } else if (engine.players.size == 1) {
-                    onGameEnd(1)
-                }
-            }
-
+            is PlayerDeathComponent -> checkGameEnd()
             is PlayerJoinComponent -> processPlayerJoinEvent(event)
             is SetupGameComponent -> spawnWalls()
+        }
+    }
+
+    private fun checkGameEnd() {
+        if (engine.character == null) {
+            onGameEnd(engine.players.size + 1)
+        } else if (engine.players.size == 1) {
+            onGameEnd(1)
         }
     }
 
