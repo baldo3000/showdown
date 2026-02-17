@@ -4,11 +4,14 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.Gdx
 import kotlinx.serialization.json.Json
+import ktx.ashley.entity
 import ktx.ashley.get
+import ktx.ashley.with
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.*
 import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
 import me.baldo3000.showdown.network.HostNetworkManager
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
@@ -37,10 +40,11 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
             onPeerDisconnect = { peerId ->
                 Gdx.app.postRunnable {
                     for (entity in engine.players) {
-                        entity[IdComponent.mapper]?.let { id ->
-                            if (id.id == peerId) {
+                        entity[IdComponent.mapper]?.id?.let { id ->
+                            if (id == peerId) {
                                 playerLastInputSequenceNumbers.remove(peerId)
                                 entity.add(RemoveComponent())
+                                engine.entity { with<PlayerDeathComponent>() }
                             }
                         }
                     }
