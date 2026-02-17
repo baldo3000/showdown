@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.utils.viewport.Viewport
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import ktx.ashley.entity
 import ktx.ashley.get
@@ -81,9 +82,15 @@ class ClientSystem(
         }.lastOrNull()
 
         if (latestPacket != null) {
-            val worldState = Json.decodeFromString<WorldSnapshot>(latestPacket.decodeToString())
-            //log.debug { "Received world update: $worldState" }
-            syncWorld(worldState)
+            try {
+                val worldState = Json.decodeFromString<WorldSnapshot>(latestPacket.decodeToString())
+                //log.debug { "Received world update: $worldState" }
+                syncWorld(worldState)
+            } catch (_: IllegalArgumentException) {
+                log.error { "A packet coming from host was discarded because it's not a WorldSnapshot" }
+            } catch (_: SerializationException) {
+                log.error { "Unknown error during deserialization of packet coming from host, discarding packet" }
+            }
         }
     }
 

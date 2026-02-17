@@ -3,6 +3,7 @@ package me.baldo3000.showdown.ecs.system
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.systems.IntervalSystem
 import com.badlogic.gdx.Gdx
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import ktx.ashley.entity
 import ktx.ashley.get
@@ -98,8 +99,14 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
     private fun processIncomingMessages() {
         while (true) {
             val packet = networkManager.receiveChannel.tryReceive().getOrNull() ?: break
-            val playerInput = Json.decodeFromString<PlayerInputPacket>(packet.decodeToString())
-            processPlayerInput(playerInput)
+            try {
+                val playerInput = Json.decodeFromString<PlayerInputPacket>(packet.decodeToString())
+                processPlayerInput(playerInput)
+            } catch (_: IllegalArgumentException) {
+                log.error { "A packet coming from client was discarded because it's not a PlayerInputPacket" }
+            } catch (_: SerializationException) {
+                log.error { "Unknown error during deserialization of packet coming from client, discarding packet" }
+            }
         }
     }
 
