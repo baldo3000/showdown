@@ -37,9 +37,13 @@ class HostNetworkManager(
     private val _receiveChannel = Channel<ByteArray>(128, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val receiveChannel: ReceiveChannel<ByteArray> = _receiveChannel
 
-    private val _address = AtomicReference<Address?>(null)
-    val address: Address?
-        get() = _address.load()
+    private val _addresses = AtomicReference<List<String>>(listOf())
+    val addresses: List<String>
+        get() = _addresses.load()
+
+    private val _port = AtomicReference<Int?>(null)
+    val port: Int?
+        get() = _port.load()
 
     val connectedPeerIds: Set<Uuid>
         get() = connectedPeers.keys
@@ -53,9 +57,11 @@ class HostNetworkManager(
                 udpSocket = aSocket(selector).udp().bind("0.0.0.0", tcpServer.localAddress.port())
 
                 // log.info { "Host is listening on ${tcpServer.localAddress}" }
-                val actualAddress = Address(localIpv4Addresses(), tcpServer.localAddress.port())
-                log.info { "Host is listening on address $actualAddress" }
-                _address.store(actualAddress)
+                val actualAddresses = localIpv4Addresses()
+                val actualPort = tcpServer.localAddress.port()
+                log.info { "Host is listening on addresses $actualAddresses on port $actualPort" }
+                _addresses.store(actualAddresses)
+                _port.store(actualPort)
 
                 // UDP Listener
                 launch {
@@ -111,7 +117,8 @@ class HostNetworkManager(
         connectedPeers.clear()
         tcpOuts.clear()
         runningJobs.clear()
-        _address.store(null)
+        _addresses.store(listOf())
+        _port.store(null)
     }
 
     private fun handleNewConnection(socket: Socket) {
@@ -151,7 +158,7 @@ class HostNetworkManager(
         }
     }
 
-    private fun localIpv4Addresses(): String {
+    private fun localIpv4Addresses(): List<String> {
         val skipKeywords = listOf("vEthernet", "WSL", "Hyper-V")
 
         fun ifaceAllowed(netIf: NetworkInterface): Boolean {
@@ -172,7 +179,7 @@ class HostNetworkManager(
             .filterIsInstance<Inet4Address>()
             .filter { !it.isLinkLocalAddress && !it.isLoopbackAddress }
             .map { it.hostAddress }
-            .toList().first()
+            .toList()
     }
 
     companion object {
