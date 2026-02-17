@@ -76,7 +76,7 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
 
     override fun updateInterval() {
         Gdx.graphics.setTitle(
-            "Showdown - Host listening on addresses ${networkManager.addresses}, port ${networkManager.port ?: "Unknown Port"} - Players: ${networkManager.connectedPeerIds.size}"
+            "Showdown - Host listening on addresses ${networkManager.addresses}, port ${networkManager.port ?: "Unknown Port"} - Players: ${engine.players.size}"
         )
         processIncomingMessages()
         broadcastWorldState()
