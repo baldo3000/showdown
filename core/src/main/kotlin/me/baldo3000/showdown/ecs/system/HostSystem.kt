@@ -14,7 +14,7 @@ import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
 import kotlin.uuid.Uuid
 
-private const val UPDATE_RATE = 1 / 30f
+private const val UPDATE_RATE = 1 / 60f
 
 class HostSystem : IntervalSystem(UPDATE_RATE) {
     private val networkManager: HostNetworkManager

@@ -62,7 +62,7 @@ class HostNetworkManager(
                     while (isActive) {
                         val datagram = udpSocket.receive()
                         val payload = datagram.packet.readByteArray()
-                        // logger.info { "Received UDP message: ${payload.decodeToString()}" }
+                        // log.info { "Received UDP message: ${payload.decodeToString()}" }
                         _receiveChannel.trySend(payload)
                     }
                 }
@@ -70,7 +70,7 @@ class HostNetworkManager(
                 // UDP Sender
                 launch {
                     for (payload in _sendChannel) {
-                        // logger.info { "Broadcasting UDP message: ${payload.decodeToString()}" }
+                        // log.info { "Broadcasting UDP message: ${payload.decodeToString()}" }
                         connectedPeers.values.forEach { peer ->
                             udpSocket.send(
                                 Datagram(

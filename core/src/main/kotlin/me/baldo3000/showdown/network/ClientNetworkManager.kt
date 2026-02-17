@@ -59,7 +59,7 @@ class ClientNetworkManager(
                     while (isActive) {
                         val datagram = udpSocket.receive()
                         val payload = datagram.packet.readByteArray()
-                        // logger.info { "Received UDP message: ${payload.decodeToString()}" }
+                        // log.info { "Received UDP message: ${payload.decodeToString()}" }
                         _receiveChannel.trySend(payload)
                     }
                 }
@@ -68,7 +68,7 @@ class ClientNetworkManager(
                 launch {
                     val hostAddress = InetSocketAddress(hostIp, port)
                     for (payload in _sendChannel) {
-                        // logger.info { "Sending UDP message: ${payload.decodeToString()}" }
+                        // log.info { "Sending UDP message: ${payload.decodeToString()}" }
                         udpSocket.send(Datagram(buildPacket { writeFully(payload) }, hostAddress))
                     }
                 }

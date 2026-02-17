@@ -76,7 +76,6 @@ class ClientSystem(
     }
 
     private fun processIncomingMessages() {
-        //var latestPacket: ByteArray? = null
         val latestPacket = generateSequence {
             networkManager.receiveChannel.tryReceive().getOrNull()
         }.lastOrNull()
