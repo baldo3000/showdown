@@ -34,8 +34,12 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
         networkManager = HostNetworkManager(
             onPeerConnect = { peerId ->
                 Gdx.app.postRunnable {
-                    engine.spawnPlayer(peerId, false)
-                    playerLastInputSequenceNumbers[peerId] = -1
+                    if (engine.isGameFull) {
+                        networkManager.disconnectClient(peerId)
+                    } else {
+                        engine.spawnPlayer(peerId, false)
+                        playerLastInputSequenceNumbers[peerId] = -1
+                    }
                 }
             },
             onPeerDisconnect = { peerId ->

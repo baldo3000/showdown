@@ -109,6 +109,10 @@ class HostNetworkManager(
         _sendChannel.trySend(payload)
     }
 
+    override fun disconnectClient(peerId: Uuid) {
+        connectedPeers[peerId]?.tcpSocket?.close()
+    }
+
     override fun stop() {
         log.debug { "Stopping host..." }
         //scope.cancel()

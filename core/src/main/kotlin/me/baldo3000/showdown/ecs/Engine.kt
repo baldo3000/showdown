@@ -10,6 +10,7 @@ import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.component.event.PlayerJoinComponent
 import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
+import me.baldo3000.showdown.ecs.system.GameEventsSystem
 import me.baldo3000.showdown.ecs.system.PlayerInputSystem
 import me.baldo3000.showdown.ui.Textures
 import me.baldo3000.showdown.world.ShowdownWorld
@@ -202,4 +203,11 @@ var Engine.processingInput: Boolean
             getSystem<PlayerInputSystem>().inputEnabled = value
         } catch (_: MissingEntitySystemException) {
         }
+    }
+
+val Engine.isGameFull: Boolean
+    get() = try {
+        getSystem<GameEventsSystem>().world.isGameFull() || processingInput
+    } catch (_: MissingEntitySystemException) {
+        false
     }

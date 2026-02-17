@@ -24,7 +24,7 @@ class GameEventsSystem : IteratingSystem(
         SetupGameComponent::class
     ).exclude(RemoveComponent::class).get()
 ) {
-    private val world: ShowdownWorld = ShowdownWorld()
+    val world: ShowdownWorld = ShowdownWorld()
     var onGameEnd: (placement: Int) -> Unit = {}
 
     override fun setProcessing(processing: Boolean) {
