@@ -52,7 +52,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
             addSystem(CollisionSystem().apply { setProcessing(false) })
             addSystem(CameraSystem(gameViewport).apply { setProcessing(false) })
             addSystem(RenderSystem(stage.batch, gameViewport).apply { setProcessing(false) })
-            addSystem(HostSystem(entityFactory, gameState).apply { setProcessing(false) })
+            addSystem(HostSystem(networkConfig, entityFactory, gameState).apply { setProcessing(false) })
             addSystem(ClientSystem(gameViewport, networkConfig, entityFactory).apply { setProcessing(false) })
             addSystem(GameEventsSystem(entityFactory, gameState).apply { setProcessing(false) })
             addSystem(RemoveSystem().apply { setProcessing(false) })

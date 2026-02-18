@@ -60,6 +60,7 @@ class ClientSystem(
         super.setProcessing(processing)
         if (processing) {
             addInputProcessor(this)
+            networkManager.setUDPDropRate(networkConfig.udpDropRate)
             networkManager.connect(networkConfig.hostAddress.ip, networkConfig.hostAddress.port)
         } else {
             reset()

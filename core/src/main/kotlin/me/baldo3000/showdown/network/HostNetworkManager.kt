@@ -26,6 +26,8 @@ class HostNetworkManager(
     val onPeerConnect: (Uuid) -> Unit = {},
     val onPeerDisconnect: (Uuid) -> Unit = {}
 ) : Host {
+    private var udpDropRate = 0f
+
     private val selector = SelectorManager(Dispatchers.IO)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val runningJobs = mutableSetOf<Job>()
@@ -78,12 +80,16 @@ class HostNetworkManager(
                     for (payload in _sendChannel) {
                         // log.info { "Broadcasting UDP message: ${payload.decodeToString()}" }
                         connectedPeers.values.forEach { peer ->
-                            udpSocket.send(
-                                Datagram(
-                                    buildPacket { writeFully(payload) },
-                                    peer.udpAddress.inetSocketAddress
+                            if (!shouldDropPacket()) {
+                                udpSocket.send(
+                                    Datagram(
+                                        buildPacket { writeFully(payload) },
+                                        peer.udpAddress.inetSocketAddress
+                                    )
                                 )
-                            )
+                            } else {
+                                log.debug { "Dropping UDP packet before sending" }
+                            }
                         }
                     }
                 }
@@ -113,6 +119,10 @@ class HostNetworkManager(
         connectedPeers[peerId]?.tcpSocket?.close()
     }
 
+    override fun setUDPDropRate(dropRate: Float) {
+        udpDropRate = dropRate.coerceIn(0f, 1f)
+    }
+
     override fun stop() {
         log.debug { "Stopping host..." }
         //scope.cancel()
@@ -123,6 +133,10 @@ class HostNetworkManager(
         runningJobs.clear()
         _addresses.store(listOf())
         _port.store(null)
+    }
+
+    private fun shouldDropPacket(): Boolean {
+        return Math.random() < udpDropRate
     }
 
     private fun handleNewConnection(socket: Socket) {

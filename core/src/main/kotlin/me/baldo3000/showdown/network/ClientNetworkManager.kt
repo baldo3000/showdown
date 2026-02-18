@@ -21,6 +21,8 @@ class ClientNetworkManager(
     val onConnectionFailure: () -> Unit = {},
     val onDisconnect: () -> Unit = {}
 ) : Client {
+    private var udpDropRate = 0f
+
     private val selector = SelectorManager(Dispatchers.IO)
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val runningJobs = mutableSetOf<Job>()
@@ -68,8 +70,12 @@ class ClientNetworkManager(
                 launch {
                     val hostAddress = InetSocketAddress(hostIp, port)
                     for (payload in _sendChannel) {
-                        // log.info { "Sending UDP message: ${payload.decodeToString()}" }
-                        udpSocket.send(Datagram(buildPacket { writeFully(payload) }, hostAddress))
+                        if (!shouldDropPacket()) {
+                            // log.info { "Sending UDP message: ${payload.decodeToString()}" }
+                            udpSocket.send(Datagram(buildPacket { writeFully(payload) }, hostAddress))
+                        } else {
+                            log.debug { "Dropping UDP packet before sending" }
+                        }
                     }
                 }
 
@@ -97,12 +103,20 @@ class ClientNetworkManager(
         _sendChannel.trySend(payload)
     }
 
+    override fun setUDPDropRate(dropRate: Float) {
+        udpDropRate = dropRate.coerceIn(0f, 1f)
+    }
+
     override fun stop() {
         log.debug { "Stopping client..." }
         // scope.cancel()
         runBlocking { runningJobs.forEach { it.cancelAndJoin() } }
         log.debug { "Client is now stopped" }
         _id.store(null)
+    }
+
+    private fun shouldDropPacket(): Boolean {
+        return Math.random() < udpDropRate
     }
 
     companion object {

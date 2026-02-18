@@ -11,11 +11,13 @@ import me.baldo3000.showdown.ui.HomeUI
 
 class HomeScreen(game: Showdown) : ShowdownScreen(game) {
     private val ui = HomeUI(
-        onHost = {
+        onHost = { updDropRate ->
+            game.networkConfig.udpDropRate = updDropRate
             game.networkConfig.mode = NetworkConfig.Mode.HOST
             game.setScreen<GameScreen>()
         },
-        onJoin = { ip, port ->
+        onJoin = { ip, port, updDropRate ->
+            game.networkConfig.udpDropRate = updDropRate
             game.networkConfig.mode = NetworkConfig.Mode.CLIENT
             game.networkConfig.hostAddress = Address(ip, port)
             game.setScreen<GameScreen>()
@@ -28,12 +30,14 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
         super.show()
         log.debug { "HomeScreen is shown" }
         stage += ui.table
+        stage += ui.udpDropRateTable
     }
 
     override fun hide() {
         super.hide()
         log.debug { "HomeScreen is hidden" }
         stage -= ui.table
+        stage -= ui.udpDropRateTable
     }
 
     override fun render(delta: Float) {

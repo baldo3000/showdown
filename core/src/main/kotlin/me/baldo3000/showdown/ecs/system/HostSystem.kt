@@ -18,6 +18,7 @@ import me.baldo3000.showdown.ecs.walls
 import me.baldo3000.showdown.game.EntityFactory
 import me.baldo3000.showdown.game.GameState
 import me.baldo3000.showdown.network.HostNetworkManager
+import me.baldo3000.showdown.network.NetworkConfig
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
 import kotlin.uuid.Uuid
@@ -25,6 +26,7 @@ import kotlin.uuid.Uuid
 private const val UPDATE_RATE = 1 / 60f
 
 class HostSystem(
+    private val networkConfig: NetworkConfig,
     private val entityFactory: EntityFactory,
     private val gameState: GameState
 ) : IntervalSystem(UPDATE_RATE) {
@@ -72,6 +74,7 @@ class HostSystem(
             sessionId = Uuid.random()
             entityFactory.createPlayer(Uuid.random(), gameState.newPlayerSpawnLocation(), true)
             entityFactory.createWallsFromMapSize(gameState.mapSize)
+            networkManager.setUDPDropRate(networkConfig.udpDropRate)
             networkManager.start()
         } else {
             Gdx.graphics.setTitle("Showdown")

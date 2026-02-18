@@ -15,6 +15,8 @@ interface Host {
 
     fun disconnectClient(peerId: Uuid)
 
+    fun setUDPDropRate(dropRate: Float)
+
     fun stop()
 }
 
@@ -22,6 +24,8 @@ interface Client {
     fun connect(hostIp: String, port: Int)
 
     fun sendToHost(payload: ByteArray)
+
+    fun setUDPDropRate(dropRate: Float)
 
     fun stop()
 }

@@ -11,8 +11,8 @@ private const val MENU_ELEMENT_OFFSET_TITLE_Y = 20f
 private const val MENU_DEFAULT_PADDING = 2.5f
 
 class HomeUI(
-    private val onHost: () -> Unit = {},
-    private val onJoin: (String, Int) -> Unit = { _, _ -> },
+    private val onHost: (Float) -> Unit = {},
+    private val onJoin: (String, Int, Float) -> Unit = { _, _, _ -> },
     private val onCredits: () -> Unit = {},
     private val onQuit: () -> Unit = {}
 ) {
@@ -23,6 +23,9 @@ class HomeUI(
     private val clientGameButton: TextButton
     private val creditsButton: TextButton
     private val quitGameButton: TextButton
+
+    val udpDropRateTable: KTableWidget
+    private val udpDropRateTextField: TextField
 
     init {
         table = scene2d.table {
@@ -70,11 +73,24 @@ class HomeUI(
             pack()
         }
 
-        hostGameButton.onClick { onHost() }
+        udpDropRateTable = scene2d.table {
+            label("UDP Send Drop Rate (0.0 to 1.0):") { cell ->
+                cell.padRight(MENU_DEFAULT_PADDING)
+            }
+            udpDropRateTextField = textField("0") { cell ->
+                cell.width(80f)
+            }
+
+            setFillParent(true)
+            bottom().right().pad(10f)
+            pack()
+        }
+
+        hostGameButton.onClick { onHost(udpDropRateTextField.text.toFloatOrNull() ?: 0f) }
         clientGameButton.onClick {
             val ip = ipTextField.text.trim()
             val port = portTextField.text.toIntOrNull() ?: 8080
-            onJoin(ip, port)
+            onJoin(ip, port, udpDropRateTextField.text.toFloatOrNull() ?: 0f)
         }
         creditsButton.onClick { onCredits() }
         quitGameButton.onClick { onQuit() }
