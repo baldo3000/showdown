@@ -12,7 +12,7 @@ import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.data.Vector3D
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
+import me.baldo3000.showdown.ecs.component.event.CheckGameEndComponent
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.game.EntityFactory
 import me.baldo3000.showdown.game.GameState
@@ -86,7 +86,7 @@ class Showdown : KtxGame<ShowdownScreen>() {
         MoveComponent.mapper
         RemoveComponent.mapper
         TransformComponent.mapper
-        PlayerDeathComponent.mapper
+        CheckGameEndComponent.mapper
     }
 
     private fun loadSerializers() {

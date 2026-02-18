@@ -14,7 +14,7 @@ import ktx.ashley.with
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
+import me.baldo3000.showdown.ecs.component.event.CheckGameEndComponent
 import me.baldo3000.showdown.game.EntityFactory
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
@@ -111,7 +111,7 @@ class ClientSystem(
                 val id = entity[IdComponent.mapper]?.id
                 if (id !in serverIds) {
                     if (entity[HealthComponent.mapper] != null) {
-                        engine.entity { with<PlayerDeathComponent>() }
+                        engine.entity { with<CheckGameEndComponent>() }
                     }
                     entity.add(RemoveComponent())
                     idMap.remove(id)

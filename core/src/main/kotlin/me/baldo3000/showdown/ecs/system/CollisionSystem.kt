@@ -11,7 +11,7 @@ import ktx.log.logger
 import ktx.math.minusAssign
 import ktx.math.times
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
+import me.baldo3000.showdown.ecs.component.event.CheckGameEndComponent
 
 private const val UPDATE_RATE = 1 / 60f
 
@@ -61,7 +61,7 @@ class CollisionSystem :
                             otherHealth?.apply {
                                 health -= damage.damage
                                 if (health <= 0f) {
-                                    engine.entity { with<PlayerDeathComponent>() }
+                                    engine.entity { with<CheckGameEndComponent>() }
                                     other.add(RemoveComponent())
                                 }
                             }

@@ -8,10 +8,8 @@ import ktx.ashley.oneOf
 import ktx.log.logger
 import me.baldo3000.showdown.ecs.character
 import me.baldo3000.showdown.ecs.component.RemoveComponent
+import me.baldo3000.showdown.ecs.component.event.CheckGameEndComponent
 import me.baldo3000.showdown.ecs.component.event.EventComponent
-import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
-import me.baldo3000.showdown.ecs.component.event.PlayerJoinComponent
-import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
 import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.game.EntityFactory
 import me.baldo3000.showdown.game.GameState
@@ -21,9 +19,7 @@ class GameEventsSystem(
     private val gameState: GameState
 ) : IteratingSystem(
     oneOf(
-        PlayerDeathComponent::class,
-        PlayerJoinComponent::class,
-        SetupGameComponent::class
+        CheckGameEndComponent::class
     ).exclude(RemoveComponent::class).get()
 ) {
     private var onGameEnd: (placement: Int) -> Unit = {}
@@ -38,9 +34,7 @@ class GameEventsSystem(
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
-        val event: EventComponent = entity[PlayerDeathComponent.mapper]
-            ?: entity[PlayerJoinComponent.mapper]
-            ?: entity[SetupGameComponent.mapper]
+        val event: EventComponent = entity[CheckGameEndComponent.mapper]
             ?: throw IllegalArgumentException("Entity must be an event")
 
         processEvent(event)
@@ -49,9 +43,7 @@ class GameEventsSystem(
 
     private fun processEvent(event: EventComponent) {
         when (event) {
-            is PlayerDeathComponent -> checkGameEnd()
-            is PlayerJoinComponent -> processPlayerJoinEvent(event)
-            is SetupGameComponent -> spawnWalls()
+            is CheckGameEndComponent -> checkGameEnd()
         }
     }
 
@@ -61,18 +53,6 @@ class GameEventsSystem(
         } else if (engine.players.size == 1) {
             onGameEnd(1)
         }
-    }
-
-    private fun processPlayerJoinEvent(event: PlayerJoinComponent) {
-        if (!gameState.isGameFull()) {
-            entityFactory.createPlayer(event.playerId, gameState.newPlayerSpawnLocation(), event.controllable)
-        } else {
-            log.error { "Cannot spawn new player: game is full" }
-        }
-    }
-
-    private fun spawnWalls() {
-        entityFactory.createWallsFromMapSize(gameState.mapSize)
     }
 
     companion object {

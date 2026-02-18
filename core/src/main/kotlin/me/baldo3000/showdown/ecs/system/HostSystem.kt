@@ -12,8 +12,7 @@ import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.bullets
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
-import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
+import me.baldo3000.showdown.ecs.component.event.CheckGameEndComponent
 import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.ecs.walls
 import me.baldo3000.showdown.game.EntityFactory
@@ -57,7 +56,7 @@ class HostSystem(
                             if (id == peerId) {
                                 playerLastInputSequenceNumbers.remove(peerId)
                                 entity.add(RemoveComponent())
-                                engine.entity { with<PlayerDeathComponent>() }
+                                engine.entity { with<CheckGameEndComponent>() }
                             }
                         }
                     }
@@ -72,7 +71,7 @@ class HostSystem(
             playerLastInputSequenceNumbers.clear()
             sessionId = Uuid.random()
             entityFactory.createPlayer(Uuid.random(), gameState.newPlayerSpawnLocation(), true)
-            engine.entity { with<SetupGameComponent>() }
+            entityFactory.createWallsFromMapSize(gameState.mapSize)
             networkManager.start()
         } else {
             Gdx.graphics.setTitle("Showdown")
