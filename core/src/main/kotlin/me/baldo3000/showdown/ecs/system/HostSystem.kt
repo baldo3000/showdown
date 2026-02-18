@@ -10,9 +10,14 @@ import ktx.ashley.get
 import ktx.ashley.with
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
-import me.baldo3000.showdown.ecs.*
+import me.baldo3000.showdown.ecs.bullets
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
+import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
+import me.baldo3000.showdown.ecs.players
+import me.baldo3000.showdown.ecs.walls
+import me.baldo3000.showdown.game.EntityFactory
+import me.baldo3000.showdown.game.GameState
 import me.baldo3000.showdown.network.HostNetworkManager
 import me.baldo3000.showdown.network.PlayerInputPacket
 import me.baldo3000.showdown.network.WorldSnapshot
@@ -20,7 +25,10 @@ import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 60f
 
-class HostSystem : IntervalSystem(UPDATE_RATE) {
+class HostSystem(
+    private val entityFactory: EntityFactory,
+    private val gameState: GameState
+) : IntervalSystem(UPDATE_RATE) {
     private val networkManager: HostNetworkManager
     private var snapshotSequenceNumber = 0
     private var sessionId: Uuid = Uuid.random()
@@ -34,10 +42,10 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
         networkManager = HostNetworkManager(
             onPeerConnect = { peerId ->
                 Gdx.app.postRunnable {
-                    if (engine.isGameFull) {
+                    if (gameState.isGameFull() || gameState.inputEnabled) {
                         networkManager.disconnectClient(peerId)
                     } else {
-                        engine.spawnPlayer(peerId, false)
+                        entityFactory.createPlayer(peerId, gameState.newPlayerSpawnLocation(), false)
                         playerLastInputSequenceNumbers[peerId] = -1
                     }
                 }
@@ -63,9 +71,8 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
             snapshotSequenceNumber = 0
             playerLastInputSequenceNumbers.clear()
             sessionId = Uuid.random()
-            engine.reset()
-            engine.spawnPlayer(Uuid.random(), true)
-            engine.spawnWalls()
+            entityFactory.createPlayer(Uuid.random(), gameState.newPlayerSpawnLocation(), true)
+            engine.entity { with<SetupGameComponent>() }
             networkManager.start()
         } else {
             Gdx.graphics.setTitle("Showdown")
@@ -115,7 +122,7 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
     }
 
     private fun processPlayerInput(playerInput: PlayerInputPacket) {
-        if (!engine.processingInput) return
+        if (!gameState.inputEnabled) return
         // log.debug { "Processing input packet: $playerInput" }
         val lastSequenceNumber = playerLastInputSequenceNumbers[playerInput.id]
         if (lastSequenceNumber != null) {
@@ -134,7 +141,7 @@ class HostSystem : IntervalSystem(UPDATE_RATE) {
                                 playerInput.touching.x - transform.position.x,
                                 playerInput.touching.y - transform.position.y
                             ).nor()
-                            engine.createBullet(
+                            entityFactory.createBullet(
                                 Uuid.random(),
                                 id.id,
                                 DEFAULT_DAMAGE,

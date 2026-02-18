@@ -1,8 +1,9 @@
-package me.baldo3000.showdown.world
+package me.baldo3000.showdown.game
 
 import ktx.math.component1
 import ktx.math.component2
 import me.baldo3000.showdown.data.Vector2D
+import me.baldo3000.showdown.game.api.World
 import kotlin.math.roundToInt
 
 class ShowdownWorld(val mapSize: Vector2D = Vector2D(16f, 9f), val maxPlayers: Int = 10) : World {

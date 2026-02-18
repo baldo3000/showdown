@@ -10,7 +10,8 @@ import ktx.ashley.get
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
-import me.baldo3000.showdown.ecs.createBullet
+import me.baldo3000.showdown.game.EntityFactory
+import me.baldo3000.showdown.game.GameState
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.input.removeInputProcessor
@@ -19,7 +20,9 @@ import kotlin.uuid.Uuid
 const val PLAYER_SPEED = 3f
 
 class PlayerInputSystem(
-    private val gameViewport: Viewport
+    private val gameViewport: Viewport,
+    private val entityFactory: EntityFactory,
+    private val gameState: GameState
 ) : EntitySystem(), DummyInputProcessor {
     private val family = allOf(InputComponent::class, TransformComponent::class, MoveComponent::class).get()
     private val entities
@@ -29,16 +32,6 @@ class PlayerInputSystem(
     private val tmpShootVector = Vector2D()
     private var horizontal = 0
     private var vertical = 0
-
-    var inputEnabled = true
-        set(value) {
-            if (!value) {
-                horizontal = 0
-                vertical = 0
-                updateEntitySpeeds()
-            }
-            field = value
-        }
 
     init {
         setProcessing(false)
@@ -55,11 +48,11 @@ class PlayerInputSystem(
     }
 
     private fun updateEntitySpeeds() {
-        if (inputEnabled) entities.forEach(::updateEntitySpeed)
+        if (gameState.inputEnabled) entities.forEach(::updateEntitySpeed)
     }
 
     private fun shootFromEntities() {
-        if (inputEnabled) entities.forEach(::shootFromEntity)
+        if (gameState.inputEnabled) entities.forEach(::shootFromEntity)
     }
 
     private fun updateEntitySpeed(entity: Entity) {
@@ -89,7 +82,7 @@ class PlayerInputSystem(
             tmpShootVector.y - transform.position.y
         ).nor()
 
-        engine.createBullet(
+        entityFactory.createBullet(
             Uuid.random(),
             entity[IdComponent.mapper]?.id,
             DEFAULT_DAMAGE,

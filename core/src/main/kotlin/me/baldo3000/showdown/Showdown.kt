@@ -1,6 +1,5 @@
 package me.baldo3000.showdown
 
-import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.PooledEngine
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
@@ -15,6 +14,8 @@ import me.baldo3000.showdown.data.Vector3D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
 import me.baldo3000.showdown.ecs.system.*
+import me.baldo3000.showdown.game.EntityFactory
+import me.baldo3000.showdown.game.GameState
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.network.*
 import me.baldo3000.showdown.screen.GameScreen
@@ -29,35 +30,37 @@ const val UNIT_SCALE = 1 / 16f
 
 /** [com.badlogic.gdx.ApplicationListener] implementation shared by all platforms. */
 class Showdown : KtxGame<ShowdownScreen>() {
-    val gameViewport = ExtendViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat())
     val stage: Stage by lazy {
         val result = Stage(ScreenViewport())
         addInputProcessor(result)
         result
     }
-    val engine: Engine by lazy {
-        PooledEngine(10, 1000, 10, 1000).apply {
-            addSystem(PlayerInputSystem(gameViewport).apply { setProcessing(false) })
+    val engine = PooledEngine(10, 1000, 10, 1000)
+    val gameViewport = ExtendViewport(V_WIDTH.toFloat(), V_HEIGHT.toFloat())
+    val networkConfig = NetworkConfig()
+    val entityFactory: EntityFactory by lazy { EntityFactory(engine) }
+    val gameState = GameState()
+
+    override fun create() {
+        Gdx.app.logLevel = Application.LOG_DEBUG
+        Gdx.input.inputProcessor = InputMultiplexer()
+        load()
+        createSkin()
+        engine.apply {
+            addSystem(PlayerInputSystem(gameViewport, entityFactory, gameState).apply { setProcessing(false) })
             addSystem(MoveSystem().apply { setProcessing(false) })
             addSystem(CollisionSystem().apply { setProcessing(false) })
             addSystem(CameraSystem(gameViewport).apply { setProcessing(false) })
             addSystem(RenderSystem(stage.batch, gameViewport).apply { setProcessing(false) })
-            addSystem(HostSystem().apply { setProcessing(false) })
-            addSystem(ClientSystem(gameViewport, networkConfig).apply { setProcessing(false) })
-            addSystem(GameEventsSystem().apply { setProcessing(false) })
+            addSystem(HostSystem(entityFactory, gameState).apply { setProcessing(false) })
+            addSystem(ClientSystem(gameViewport, networkConfig, entityFactory).apply { setProcessing(false) })
+            addSystem(GameEventsSystem(entityFactory, gameState).apply { setProcessing(false) })
             addSystem(RemoveSystem().apply { setProcessing(false) })
         }
-    }
-    val networkConfig = NetworkConfig()
-
-    override fun create() {
-        load()
-        Gdx.app.logLevel = Application.LOG_DEBUG
-        Gdx.input.inputProcessor = InputMultiplexer()
-        createSkin()
-        log.debug { "Game instance created" }
         addScreen(HomeScreen(this))
-        addScreen(GameScreen(this))
+        addScreen(GameScreen(this) { inputEnabled ->
+            gameState.inputEnabled = inputEnabled
+        })
         setScreen<HomeScreen>()
     }
 

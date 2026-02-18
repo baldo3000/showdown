@@ -15,9 +15,7 @@ import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.component.*
 import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
-import me.baldo3000.showdown.ecs.createBullet
-import me.baldo3000.showdown.ecs.createPlayer
-import me.baldo3000.showdown.ecs.createWall
+import me.baldo3000.showdown.game.EntityFactory
 import me.baldo3000.showdown.input.DummyInputProcessor
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.input.removeInputProcessor
@@ -31,7 +29,8 @@ private const val UPDATE_RATE = 1 / 30f
 
 class ClientSystem(
     private val gameViewport: Viewport,
-    private val networkConfig: NetworkConfig
+    private val networkConfig: NetworkConfig,
+    private val entityFactory: EntityFactory
 ) : IntervalSystem(UPDATE_RATE), DummyInputProcessor {
     private val networkManager: ClientNetworkManager
     private val idMap = mutableMapOf<Uuid, Entity>()
@@ -120,7 +119,7 @@ class ClientSystem(
             }
             state.players.forEach { snapshot ->
                 val entity = idMap.getOrPut(snapshot.id) {
-                    val newPlayer = engine.createPlayer(
+                    val newPlayer = entityFactory.createPlayer(
                         snapshot.id,
                         snapshot.position,
                         snapshot.id == networkManager.id
@@ -138,7 +137,7 @@ class ClientSystem(
 
             state.bullets.forEach { snapshot ->
                 val entity = idMap.getOrPut(snapshot.id) {
-                    val newBullet = engine.createBullet(
+                    val newBullet = entityFactory.createBullet(
                         snapshot.id,
                         snapshot.sourceId,
                         snapshot.damage,
@@ -156,7 +155,7 @@ class ClientSystem(
 
             state.walls.forEach { snapshot ->
                 idMap.getOrPut(snapshot.id) {
-                    val newWall = engine.createWall(
+                    val newWall = entityFactory.createWall(
                         snapshot.id,
                         snapshot.position,
                         snapshot.size

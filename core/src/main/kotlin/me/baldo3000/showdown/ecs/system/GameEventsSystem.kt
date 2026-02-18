@@ -12,24 +12,29 @@ import me.baldo3000.showdown.ecs.component.event.EventComponent
 import me.baldo3000.showdown.ecs.component.event.PlayerDeathComponent
 import me.baldo3000.showdown.ecs.component.event.PlayerJoinComponent
 import me.baldo3000.showdown.ecs.component.event.SetupGameComponent
-import me.baldo3000.showdown.ecs.createPlayer
 import me.baldo3000.showdown.ecs.players
-import me.baldo3000.showdown.ecs.spawnWallsFromWorld
-import me.baldo3000.showdown.world.ShowdownWorld
+import me.baldo3000.showdown.game.EntityFactory
+import me.baldo3000.showdown.game.GameState
 
-class GameEventsSystem : IteratingSystem(
+class GameEventsSystem(
+    private val entityFactory: EntityFactory,
+    private val gameState: GameState
+) : IteratingSystem(
     oneOf(
         PlayerDeathComponent::class,
         PlayerJoinComponent::class,
         SetupGameComponent::class
     ).exclude(RemoveComponent::class).get()
 ) {
-    val world: ShowdownWorld = ShowdownWorld()
-    var onGameEnd: (placement: Int) -> Unit = {}
+    private var onGameEnd: (placement: Int) -> Unit = {}
+
+    fun setOnGameEnd(onGameEnd: (placement: Int) -> Unit) {
+        this.onGameEnd = onGameEnd
+    }
 
     override fun setProcessing(processing: Boolean) {
         super.setProcessing(processing)
-        if (!processing) world.reset()
+        if (!processing) gameState.reset()
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
@@ -59,16 +64,15 @@ class GameEventsSystem : IteratingSystem(
     }
 
     private fun processPlayerJoinEvent(event: PlayerJoinComponent) {
-        if (!world.isGameFull()) {
-            val spawnLocation = world.newPlayerSpawnLocation()
-            engine.createPlayer(event.playerId, spawnLocation, event.controllable)
+        if (!gameState.isGameFull()) {
+            entityFactory.createPlayer(event.playerId, gameState.newPlayerSpawnLocation(), event.controllable)
         } else {
             log.error { "Cannot spawn new player: game is full" }
         }
     }
 
     private fun spawnWalls() {
-        engine.spawnWallsFromWorld(world)
+        entityFactory.createWallsFromMapSize(gameState.mapSize)
     }
 
     companion object {

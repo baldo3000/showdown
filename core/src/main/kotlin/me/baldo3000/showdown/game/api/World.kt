@@ -1,4 +1,4 @@
-package me.baldo3000.showdown.world
+package me.baldo3000.showdown.game.api
 
 import me.baldo3000.showdown.data.Vector2D
 

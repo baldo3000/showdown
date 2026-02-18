@@ -6,8 +6,6 @@ import ktx.actors.plusAssign
 import ktx.ashley.getSystem
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
-import me.baldo3000.showdown.ecs.processingInput
-import me.baldo3000.showdown.ecs.reset
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.input.addInputProcessor
 import me.baldo3000.showdown.network.NetworkConfig
@@ -18,7 +16,10 @@ import kotlin.math.min
 
 private const val MAX_DELTA_TIME = 1 / 20f
 
-class GameScreen(game: Showdown) : ShowdownScreen(game) {
+class GameScreen(
+    game: Showdown,
+    private val setInputEnabled: (enabled: Boolean) -> Unit
+) : ShowdownScreen(game) {
 
     private val menuUI = PauseMenuUI(
         onResume = { closeMenu() },
@@ -47,9 +48,7 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
 
     init {
         engine.run {
-            getSystem<GameEventsSystem>().apply {
-                onGameEnd = ::openEnd
-            }
+            getSystem<GameEventsSystem>().setOnGameEnd(::openEnd)
             getSystem<ClientSystem>().apply {
                 onConnectionFailure = ::openConnectionFailed
                 onDisconnect = ::openDisconnect
@@ -162,26 +161,26 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
 
     private fun startGame() {
         closeHostControl()
-        engine.processingInput = true
+        setInputEnabled(true)
     }
 
     private fun returnToMainMenu() {
         game.setScreen<HomeScreen>()
-        engine.processingInput = false
+        setInputEnabled(false)
     }
 
     private fun enableGameSystems() {
-        engine.reset()
+        engine.removeAllEntities()
         engine.run {
             when (game.networkConfig.mode) {
                 NetworkConfig.Mode.HOST -> {
                     openHostControl()
-                    processingInput = false
+                    setInputEnabled(false)
                     getSystem<HostSystem>().setProcessing(true)
                 }
 
                 NetworkConfig.Mode.CLIENT -> {
-                    processingInput = true
+                    setInputEnabled(true)
                     getSystem<ClientSystem>().setProcessing(true)
                 }
             }
@@ -195,9 +194,9 @@ class GameScreen(game: Showdown) : ShowdownScreen(game) {
     }
 
     private fun disableGameSystems() {
-        engine.reset()
+        engine.removeAllEntities()
         engine.run {
-            processingInput = false
+            setInputEnabled(false)
             getSystem<CameraSystem>().setProcessing(false)
             getSystem<CollisionSystem>().setProcessing(false)
             getSystem<GameEventsSystem>().setProcessing(false)
