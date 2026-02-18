@@ -8,6 +8,7 @@ import ktx.log.logger
 import me.baldo3000.showdown.Showdown
 import me.baldo3000.showdown.ecs.system.*
 import me.baldo3000.showdown.input.addInputProcessor
+import me.baldo3000.showdown.input.removeInputProcessor
 import me.baldo3000.showdown.network.NetworkConfig
 import me.baldo3000.showdown.ui.GameEndUI
 import me.baldo3000.showdown.ui.HostControlUI
@@ -69,6 +70,7 @@ class GameScreen(
         closeMenu()
         closeEnd()
         closeHostControl()
+        removeInputProcessor(escProcessor)
         disableGameSystems()
     }
 
