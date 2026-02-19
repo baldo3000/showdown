@@ -77,7 +77,7 @@ class HomeUI(
             label("UDP Send Drop Rate (0.0 to 1.0):") { cell ->
                 cell.padRight(MENU_DEFAULT_PADDING)
             }
-            udpDropRateTextField = textField("0") { cell ->
+            udpDropRateTextField = textField("0.0") { cell ->
                 cell.width(80f)
             }
 
