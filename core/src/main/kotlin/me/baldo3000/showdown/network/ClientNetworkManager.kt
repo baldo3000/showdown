@@ -111,6 +111,11 @@ class ClientNetworkManager(
         log.debug { "Stopping client..." }
         // scope.cancel()
         runBlocking { runningJobs.forEach { it.cancelAndJoin() } }
+        // Drain any leftover packets
+        while (_receiveChannel.tryReceive().isSuccess) { /* discard */
+        }
+        while (_sendChannel.tryReceive().isSuccess) { /* discard */
+        }
         runningJobs.clear()
         log.debug { "Client is now stopped" }
         _id.store(null)

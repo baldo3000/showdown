@@ -125,8 +125,13 @@ class HostNetworkManager(
 
     override fun stop() {
         log.debug { "Stopping host..." }
-        //scope.cancel()
+        //  scope.cancel()
         runBlocking { runningJobs.forEach { it.cancelAndJoin() } }
+        // Discard any leftover packets
+        while (_receiveChannel.tryReceive().isSuccess) { /* discard */
+        }
+        while (_sendChannel.tryReceive().isSuccess) {/* discard */
+        }
         log.debug { "Host is now stopped" }
         connectedPeers.clear()
         tcpOuts.clear()
