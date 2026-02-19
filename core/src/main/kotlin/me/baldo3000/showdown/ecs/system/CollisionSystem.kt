@@ -22,6 +22,11 @@ class CollisionSystem :
     ) {
     private var accumulator = 0f
 
+    override fun setProcessing(processing: Boolean) {
+        super.setProcessing(processing)
+        if (processing) accumulator = 0f
+    }
+
     override fun update(deltaTime: Float) {
         accumulator += deltaTime
         while (accumulator >= UPDATE_RATE) {
