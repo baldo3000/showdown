@@ -37,7 +37,11 @@ private val wallsFamily =
         TransformComponent::class,
         ColliderComponent::class,
         GraphicComponent::class
-    ).exclude(RemoveComponent::class).get()
+    ).exclude(
+        RemoveComponent::class,
+        HealthComponent::class,
+        MoveComponent::class
+    ).get()
 
 val Engine.players: List<Entity>
     get() = getEntitiesFor(playersFamily).toList()
@@ -50,7 +54,3 @@ val Engine.bullets: List<Entity>
 
 val Engine.walls: List<Entity>
     get() = getEntitiesFor(wallsFamily).toList()
-
-fun Engine.reset() {
-    removeAllEntities()
-}
