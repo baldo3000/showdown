@@ -111,6 +111,7 @@ class ClientNetworkManager(
         log.debug { "Stopping client..." }
         // scope.cancel()
         runBlocking { runningJobs.forEach { it.cancelAndJoin() } }
+        runningJobs.clear()
         log.debug { "Client is now stopped" }
         _id.store(null)
     }
