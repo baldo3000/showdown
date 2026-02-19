@@ -196,7 +196,6 @@ class GameScreen(
     }
 
     private fun disableGameSystems() {
-        engine.removeAllEntities()
         setInputEnabled(false)
         engine.run {
             getSystem<CameraSystem>().setProcessing(false)
@@ -209,6 +208,7 @@ class GameScreen(
             getSystem<HostSystem>().setProcessing(false)
             getSystem<ClientSystem>().setProcessing(false)
         }
+        engine.removeAllEntities()
     }
 
     companion object {
