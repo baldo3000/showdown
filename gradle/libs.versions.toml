@@ -10,11 +10,13 @@ graalBuildTools = "0.11.4"
 foojay = "1.0.0"
 ktor = "3.4.0"
 kotlinSerializationJson = "1.10.0"
+junit = "6.1.0-M1"
 
 [libraries]
 # GDX Core
 gdx-core = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }
 gdx-backend-lwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", version.ref = "gdx" }
+gdx-backend-headless = { module = "com.badlogicgames.gdx:gdx-backend-headless", version.ref = "gdx" }
 gdx-platform = { module = "com.badlogicgames.gdx:gdx-platform", version.ref = "gdx" }
 gdx-lwjgl3-angle = { module = "com.badlogicgames.gdx:gdx-lwjgl3-angle", version.ref = "gdx" }
 gdx-svmhelper-backend-lwjgl3 = { module = "io.github.berstanio:gdx-svmhelper-backend-lwjgl3", version.ref = "graalHelper" }
@@ -45,6 +47,9 @@ graal-helper-annotations = { module = "io.github.berstanio:gdx-svmhelper-annotat
 graal-helper-backend = { module = "io.github.berstanio:gdx-svmhelper-backend-lwjgl3", version.ref = "graalHelper" }
 
 ktor-network = { module = "io.ktor:ktor-network", version.ref = "ktor" }
+
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component
 import com.badlogic.gdx.utils.Pool
 import ktx.ashley.mapperFor
 
-private const val MAX_HEALTH = 100f
+const val MAX_HEALTH = 100f
 
 class HealthComponent : Component, Pool.Poolable {
     var health = MAX_HEALTH

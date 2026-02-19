@@ -7,6 +7,8 @@ class GameState {
     var inputEnabled: Boolean = true
     val mapSize
         get() = world.mapSize
+    val maxPlayers
+        get() = world.maxPlayers
 
     fun isGameFull(): Boolean = world.isGameFull()
 

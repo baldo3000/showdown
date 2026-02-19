@@ -34,4 +34,14 @@ dependencies {
   if (enableGraalNative == 'true') {
     implementation libs.graal.helper.annotations
   }
+
+  testImplementation libs.junit.jupiter
+  testRuntimeOnly libs.junit.platform.launcher
+
+  testImplementation libs.gdx.backend.headless
+  testRuntimeOnly(variantOf(libs.gdx.platform) { classifier("natives-desktop") })
+}
+
+tasks.test {
+  useJUnitPlatform()
 }
