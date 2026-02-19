@@ -18,6 +18,11 @@ class MoveSystem :
     IteratingSystem(allOf(TransformComponent::class, MoveComponent::class).exclude(RemoveComponent::class).get()) {
     private var accumulator = 0f
 
+    override fun setProcessing(processing: Boolean) {
+        super.setProcessing(processing)
+        //if (processing) accumulator = 0f
+    }
+
     override fun update(deltaTime: Float) {
         accumulator += deltaTime
         while (accumulator >= UPDATE_RATE) {

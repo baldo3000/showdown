@@ -197,8 +197,8 @@ class GameScreen(
 
     private fun disableGameSystems() {
         engine.removeAllEntities()
+        setInputEnabled(false)
         engine.run {
-            setInputEnabled(false)
             getSystem<CameraSystem>().setProcessing(false)
             getSystem<CollisionSystem>().setProcessing(false)
             getSystem<GameEventsSystem>().setProcessing(false)
