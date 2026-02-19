@@ -28,7 +28,16 @@ if (JavaVersion.current().isJava9Compatible()) {
 }
 kotlin.compilerOptions.jvmTarget.set(JvmTarget.JVM_25)
 
+/*configurations.configureEach {
+  resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+    if (details.requested.group == 'org.lwjgl') {
+      details.useVersion '3.4.1'
+    }
+  }
+}*/
+
 dependencies {
+  implementation platform(libs.lwjgl.bom)
   implementation libs.gdx.backend.lwjgl3
   implementation libs.gdx.lwjgl3.angle
   implementation(variantOf(libs.gdx.platform) { classifier("natives-desktop") })
@@ -47,6 +56,7 @@ run {
 // You can uncomment the next line if your IDE claims a build failure even when the app closed properly.
   //setIgnoreExitValue(true)
 
+  jvmArgs += "--enable-native-access=ALL-UNNAMED"
   if (os.contains('mac')) jvmArgs += "-XstartOnFirstThread"
 }
 

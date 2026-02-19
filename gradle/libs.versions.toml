@@ -10,9 +10,13 @@ graalBuildTools = "0.11.4"
 foojay = "1.0.0"
 ktor = "3.4.0"
 kotlinSerializationJson = "1.10.0"
+lwjgl = "3.4.1"
 junit = "6.1.0-M1"
 
 [libraries]
+# LWJGL
+lwjgl-bom = { module = "org.lwjgl:lwjgl-bom", version.ref = "lwjgl" }
+
 # GDX Core
 gdx-core = { module = "com.badlogicgames.gdx:gdx", version.ref = "gdx" }
 gdx-backend-lwjgl3 = { module = "com.badlogicgames.gdx:gdx-backend-lwjgl3", version.ref = "gdx" }
