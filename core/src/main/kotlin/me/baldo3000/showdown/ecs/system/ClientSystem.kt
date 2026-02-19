@@ -188,6 +188,13 @@ class ClientSystem(
 
     private fun reset() {
         idMap.clear()
+        inputSequenceNumber = 0
+        lastSnapshotSequenceNumber = -1
+        currentSessionId = null
+        playerEntity = null
+        horizontal = 0
+        vertical = 0
+        tmpShootVector = null
         removeInputProcessor(this)
         networkManager.stop()
     }
