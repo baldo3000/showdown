@@ -9,7 +9,10 @@ import ktx.ashley.allOf
 import ktx.ashley.get
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
-import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.ecs.component.IdComponent
+import me.baldo3000.showdown.ecs.component.InputComponent
+import me.baldo3000.showdown.ecs.component.MoveComponent
+import me.baldo3000.showdown.ecs.component.TransformComponent
 import me.baldo3000.showdown.game.EntityFactory
 import me.baldo3000.showdown.game.GameState
 import me.baldo3000.showdown.input.DummyInputProcessor
@@ -83,11 +86,10 @@ class PlayerInputSystem(
         ).nor()
 
         entityFactory.createBullet(
-            Uuid.random(),
-            entity[IdComponent.mapper]?.id,
-            DEFAULT_DAMAGE,
-            transform.position.to2D(),
-            Vector2D(tmpSpeedVector.x * 5f, tmpSpeedVector.y * 5f)
+            bulletId = Uuid.random(),
+            sourceId = entity[IdComponent.mapper]?.id,
+            position = transform.position.to2D(),
+            speed = Vector2D(tmpSpeedVector.x * 5f, tmpSpeedVector.y * 5f)
         )
     }
 

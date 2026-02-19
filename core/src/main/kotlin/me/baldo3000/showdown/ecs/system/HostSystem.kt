@@ -11,7 +11,10 @@ import ktx.ashley.with
 import ktx.log.logger
 import me.baldo3000.showdown.data.Vector2D
 import me.baldo3000.showdown.ecs.bullets
-import me.baldo3000.showdown.ecs.component.*
+import me.baldo3000.showdown.ecs.component.IdComponent
+import me.baldo3000.showdown.ecs.component.MoveComponent
+import me.baldo3000.showdown.ecs.component.RemoveComponent
+import me.baldo3000.showdown.ecs.component.TransformComponent
 import me.baldo3000.showdown.ecs.component.event.CheckGameEndComponent
 import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.ecs.walls
@@ -144,11 +147,10 @@ class HostSystem(
                                 playerInput.touching.y - transform.position.y
                             ).nor()
                             entityFactory.createBullet(
-                                Uuid.random(),
-                                id.id,
-                                DEFAULT_DAMAGE,
-                                transform.position.to2D(),
-                                Vector2D(bulletSpeedVector.x * 5f, bulletSpeedVector.y * 5f)
+                                bulletId = Uuid.random(),
+                                sourceId = id.id,
+                                position = transform.position.to2D(),
+                                speed = Vector2D(bulletSpeedVector.x * 5f, bulletSpeedVector.y * 5f)
                             )
                         }
                     }
