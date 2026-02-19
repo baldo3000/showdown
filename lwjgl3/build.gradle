@@ -67,9 +67,9 @@ jar {
     attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED'
   }
 // this last step may help on some OSes that need extra instruction to make runnable JARs.
-  doLast {
+  /*doLast {
     file(archiveFile).setExecutable(true, false)
-  }
+  }*/
 }
 
 // Builds a JAR that only includes the files needed to run on macOS, not Windows or Linux.
