@@ -11,11 +11,9 @@ import me.baldo3000.showdown.ecs.component.RemoveComponent
 import me.baldo3000.showdown.ecs.component.event.CheckGameEndComponent
 import me.baldo3000.showdown.ecs.component.event.EventComponent
 import me.baldo3000.showdown.ecs.players
-import me.baldo3000.showdown.game.EntityFactory
 import me.baldo3000.showdown.game.GameState
 
 class GameEventsSystem(
-    private val entityFactory: EntityFactory,
     private val gameState: GameState
 ) : IteratingSystem(
     oneOf(

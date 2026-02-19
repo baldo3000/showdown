@@ -14,7 +14,7 @@ import me.baldo3000.showdown.ecs.component.TransformComponent
 
 private const val UPDATE_RATE = 1 / 60f
 
-class MoveSystem() :
+class MoveSystem :
     IteratingSystem(allOf(TransformComponent::class, MoveComponent::class).exclude(RemoveComponent::class).get()) {
     private var accumulator = 0f
 
@@ -69,9 +69,7 @@ class MoveSystem() :
         transform.position.x += deltaX
         transform.position.y += deltaY
 
-        if (collider != null) {
-            collider.collider.setCenter(transform.position.x, transform.position.y)
-        }
+        collider?.collider?.setCenter(transform.position.x, transform.position.y)
     }
 
     companion object {

@@ -179,11 +179,11 @@ class HostNetworkManager(
     private fun localIpv4Addresses(): List<String> {
         val skipKeywords = listOf("vEthernet", "WSL", "Hyper-V")
 
-        fun ifaceAllowed(netIf: NetworkInterface): Boolean {
+        fun isFaceAllowed(netIf: NetworkInterface): Boolean {
             val name = netIf.name ?: ""
-            val disp = netIf.displayName ?: ""
+            val display = netIf.displayName ?: ""
             return skipKeywords.none { kw ->
-                name.contains(kw, ignoreCase = true) || disp.contains(
+                name.contains(kw, ignoreCase = true) || display.contains(
                     kw,
                     ignoreCase = true
                 )
@@ -192,7 +192,7 @@ class HostNetworkManager(
 
         return Collections.list(NetworkInterface.getNetworkInterfaces())
             .asSequence()
-            .filter { it.isUp && ifaceAllowed(it) && !it.isLoopback }
+            .filter { it.isUp && isFaceAllowed(it) && !it.isLoopback }
             .flatMap { Collections.list(it.inetAddresses).asSequence() }
             .filterIsInstance<Inet4Address>()
             .filter { !it.isLinkLocalAddress && !it.isLoopbackAddress }
