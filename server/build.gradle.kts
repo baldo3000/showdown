@@ -30,6 +30,7 @@ plugins.withId("eclipse") {
 dependencies {
     api(libs.kotlin.stdlib)
     api(libs.kotlinx.coroutines)
+    implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.core)
