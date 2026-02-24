@@ -3,6 +3,7 @@ package me.baldo3000.showdown
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import me.baldo3000.showdown.discovery.configureDiscovery
 import me.baldo3000.showdown.lobbies.configureRouting
 
 fun main() {
@@ -13,4 +14,5 @@ fun main() {
 fun Application.module() {
     configureSerialization()
     configureRouting()
+    configureDiscovery()
 }

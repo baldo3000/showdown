@@ -8,6 +8,7 @@ import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.collections.*
+import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import me.baldo3000.showdown.dto.LobbiesDTO
 import me.baldo3000.showdown.dto.LobbyDTO
@@ -31,7 +32,7 @@ fun Application.configureRouting() {
         post("/lobby") {
             try {
                 val lobbyDTO = call.receive<LobbyDTO>()
-                println("Adding lobby: $lobbyDTO")
+                log.debug { "Adding lobby: $lobbyDTO" }
                 val lobby = Lobby(lobbyDTO.ip, lobbyDTO.port)
                 lobbies.add(lobby)
                 call.validLobby()
@@ -47,7 +48,7 @@ fun Application.configureRouting() {
         delete("/lobby") {
             try {
                 val lobbyDTO = call.receive<LobbyDTO>()
-                println("Removing lobby: $lobbyDTO")
+                log.debug { "Removing lobby: $lobbyDTO" }
                 lobbies.remove(Lobby(lobbyDTO.ip, lobbyDTO.port))
                 call.validLobby()
             } catch (_: ContentTransformationException) {
