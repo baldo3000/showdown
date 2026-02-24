@@ -8,10 +8,11 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
+import kotlinx.coroutines.delay
 import me.baldo3000.showdown.dto.LobbiesDTO
 import me.baldo3000.showdown.dto.LobbyDTO
 import me.baldo3000.showdown.module
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
@@ -56,12 +57,42 @@ class TestLobbiesRoutes {
         assertEquals(HttpStatusCode.BadRequest, response.status)
     }
 
+    @Test
+    fun `getting at lobbies should return the posted lobby (even many times)`() = setUp { client ->
+        repeat(5) {
+            client.httpMethod(HttpMethod.Post, LOBBY_URL, exampleLobby)
+        }
+        val lobbiesDTO = client.receiveLobbiesDTO()
+        assertTrue(lobbiesDTO.lobbies.contains(exampleLobby))
+    }
+
+    @Test
+    fun `getting at lobbies should not return the posted lobby if expired`() = setUp { client ->
+        client.httpMethod(HttpMethod.Post, LOBBY_URL, exampleLobby)
+        delay(LOBBY_EXPIRE_TIME_MS)
+        val lobbiesDTO = client.receiveLobbiesDTO()
+        assertFalse(lobbiesDTO.lobbies.contains(exampleLobby))
+    }
+
+    @Test
+    fun `getting at lobbies should not return the posted lobby if then removed`() = setUp { client ->
+        client.httpMethod(HttpMethod.Post, LOBBY_URL, exampleLobby)
+        client.httpMethod(HttpMethod.Delete, LOBBY_URL, exampleLobby)
+        val lobbiesDTO = client.receiveLobbiesDTO()
+        assertFalse(lobbiesDTO.lobbies.contains(exampleLobby))
+    }
+
     private suspend fun HttpClient.httpMethod(method: HttpMethod, url: String, body: Any? = null): HttpResponse {
         return this.request(url) {
             this.method = method
             contentType(ContentType.Application.Json)
             setBody(body)
         }
+    }
+
+    private suspend fun HttpClient.receiveLobbiesDTO(): LobbiesDTO {
+        val response = this.get(LOBBIES_URL)
+        return response.body()
     }
 
     companion object {
