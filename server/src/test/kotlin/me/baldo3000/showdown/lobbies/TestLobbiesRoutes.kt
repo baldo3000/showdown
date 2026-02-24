@@ -1,4 +1,4 @@
-package me.baldo3000.showdown
+package me.baldo3000.showdown.lobbies
 
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -10,11 +10,12 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
 import me.baldo3000.showdown.dto.LobbiesDTO
 import me.baldo3000.showdown.dto.LobbyDTO
+import me.baldo3000.showdown.module
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
-class TestRouting {
+class TestLobbiesRoutes {
     private fun setUp(body: suspend (HttpClient) -> Unit) = testApplication {
         application { module() }
         client = createClient { install(ContentNegotiation) { json() } }
