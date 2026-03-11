@@ -33,12 +33,16 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
                 ui.updateServerAddress("Searching...")
                 discoveryClient.search(
                     onResult = { address ->
-                        game.networkConfig.lobbyServerAddress = Address(address.ip, address.port)
-                        ui.updateServerAddress("${address.ip}:${address.port}")
+                        Gdx.app.postRunnable {
+                            game.networkConfig.lobbyServerAddress = Address(address.ip, address.port)
+                            ui.updateServerAddress("${address.ip}:${address.port}")
+                        }
                     },
                     onTimeout = {
-                        game.networkConfig.lobbyServerAddress = null
-                        ui.updateServerAddress("No server found")
+                        Gdx.app.postRunnable {
+                            game.networkConfig.lobbyServerAddress = null
+                            ui.updateServerAddress("No server found")
+                        }
                     }
                 )
             },
@@ -50,8 +54,8 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
                     ui.setLobbiesStatus("Loading...")
                     lobbyHttpClient.fetchLobbies(
                         lobbyServer = serverAddress,
-                        onResult = { lobbiesDTO -> ui.updateLobbies(lobbiesDTO.lobbies) },
-                        onTimeout = { ui.setLobbiesStatus("Failed to reach server") }
+                        onResult = { lobbiesDTO -> Gdx.app.postRunnable { ui.updateLobbies(lobbiesDTO.lobbies) } },
+                        onTimeout = { Gdx.app.postRunnable { ui.setLobbiesStatus("Failed to reach server") } }
                     )
                 }
             },
