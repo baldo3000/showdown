@@ -17,7 +17,7 @@ class HomeUI(
     private val onJoin: (String, Int, Float) -> Unit = { _, _, _ -> },
     private val onSearchForServer: () -> Unit = {},
     private val onRefreshLobbies: () -> Unit = {},
-    private val onLobbySelected: (AddressDTO) -> Unit = {},
+    private val onLobbySelected: (String, Int, Float) -> Unit = { _, _, _ -> },
     private val onCredits: () -> Unit = {},
     private val onQuit: () -> Unit = {}
 ) {
@@ -61,7 +61,7 @@ class HomeUI(
             row()
 
             label("Port:") { cell -> cell.expandX().fillX().colspan(1) }
-            portTextField = textField("8080") { cell -> cell.expandX().fillX().colspan(1) }
+            portTextField = textField("65432") { cell -> cell.expandX().fillX().colspan(1) }
             row()
 
             // Join
@@ -115,7 +115,7 @@ class HomeUI(
         hostGameButton.onClick { onHost(udpDropRateTextField.text.toFloatOrNull() ?: 0f) }
         clientGameButton.onClick {
             val ip = ipTextField.text.trim()
-            val port = portTextField.text.toIntOrNull() ?: 8080
+            val port = portTextField.text.toIntOrNull() ?: 65432
             onJoin(ip, port, udpDropRateTextField.text.toFloatOrNull() ?: 0f)
         }
         searchForServerButton.onClick { onSearchForServer() }
@@ -139,7 +139,7 @@ class HomeUI(
             lobbiesContainer.row()
             for (lobby in lobbies) {
                 val btn = TextButton("${lobby.ip}:${lobby.port}", Scene2DSkin.defaultSkin)
-                btn.onClick { onLobbySelected(lobby) }
+                btn.onClick { onLobbySelected(lobby.ip, lobby.port, udpDropRateTextField.text.toFloatOrNull() ?: 0f) }
                 lobbiesContainer.add(btn).expandX().fillX().pad(MENU_DEFAULT_PADDING)
                 lobbiesContainer.row()
             }

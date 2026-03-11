@@ -23,12 +23,7 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
                 game.networkConfig.mode = NetworkConfig.Mode.HOST
                 game.setScreen<GameScreen>()
             },
-            onJoin = { ip, port, updDropRate ->
-                game.networkConfig.udpDropRate = updDropRate
-                game.networkConfig.mode = NetworkConfig.Mode.CLIENT
-                game.networkConfig.hostAddress = Address(ip, port)
-                game.setScreen<GameScreen>()
-            },
+            onJoin = ::joinLobby,
             onSearchForServer = {
                 ui.updateServerAddress("Searching...")
                 discoveryClient.search(
@@ -59,10 +54,17 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
                     )
                 }
             },
-            onLobbySelected = { /* TODO: connect to selected lobby */ },
+            onLobbySelected = ::joinLobby,
             onCredits = { log.debug { "Credits button clicked" } },
             onQuit = { Gdx.app.exit() }
         )
+    }
+
+    private fun joinLobby(ip: String, port: Int, udpDropRate: Float) {
+        game.networkConfig.udpDropRate = udpDropRate
+        game.networkConfig.mode = NetworkConfig.Mode.CLIENT
+        game.networkConfig.hostAddress = Address(ip, port)
+        game.setScreen<GameScreen>()
     }
 
     override fun show() {
