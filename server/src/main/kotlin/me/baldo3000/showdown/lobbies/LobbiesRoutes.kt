@@ -15,15 +15,10 @@ import me.baldo3000.showdown.dto.LobbiesDTO
 import me.baldo3000.showdown.network.LOBBIES_ROUTE
 import me.baldo3000.showdown.network.LOBBY_ROUTE
 
-const val LOBBY_EXPIRE_TIME_MS = 30 * 1000L // 30 seconds
+const val LOBBY_EXPIRE_TIME_MS = 5 * 1000L // 5 seconds
 
 fun Application.configureRouting() {
     val lobbies = ConcurrentSet<Lobby>()
-
-    // TODO: Remove
-    lobbies.add(Lobby("192.168.1.180", 1234))
-    lobbies.add(Lobby("192.168.1.181", 567))
-    lobbies.add(Lobby("192.168.1.182", 89))
 
     routing {
         get(LOBBIES_ROUTE) {

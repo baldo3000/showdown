@@ -25,7 +25,7 @@ import me.baldo3000.showdown.network.api.Address
 import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 60f
-private const val SERVER_SIGNAL_UPDATE_RATE = 10f
+private const val SERVER_SIGNAL_UPDATE_RATE = 2.5f
 
 class HostSystem(
     private val networkConfig: NetworkConfig,
@@ -99,7 +99,7 @@ class HostSystem(
         accumulator += UPDATE_RATE
         if (accumulator >= SERVER_SIGNAL_UPDATE_RATE) {
             accumulator -= SERVER_SIGNAL_UPDATE_RATE
-            updateLobbyServer()
+            if (!gameState.inputEnabled) updateLobbyServer()
         }
         processIncomingMessages()
         broadcastWorldState()
