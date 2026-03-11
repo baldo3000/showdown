@@ -1,5 +1,6 @@
 package me.baldo3000.showdown.ui
 
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.badlogic.gdx.utils.Align
@@ -13,6 +14,7 @@ private const val MENU_DEFAULT_PADDING = 2.5f
 class HomeUI(
     private val onHost: (Float) -> Unit = {},
     private val onJoin: (String, Int, Float) -> Unit = { _, _, _ -> },
+    private val onSearchForServer: () -> Unit = {},
     private val onCredits: () -> Unit = {},
     private val onQuit: () -> Unit = {}
 ) {
@@ -21,6 +23,8 @@ class HomeUI(
     private val ipTextField: TextField
     private val portTextField: TextField
     private val clientGameButton: TextButton
+    private val searchForServerButton: TextButton
+    private val serverAddressLabel: Label
     private val creditsButton: TextButton
     private val quitGameButton: TextButton
 
@@ -63,6 +67,14 @@ class HomeUI(
             clientGameButton = textButton("Join a game")
             row()
 
+            searchForServerButton = textButton("Search for lobby server") { cell ->
+                cell.expandX().fillX().colspan(1)
+            }
+            serverAddressLabel = label("No server found") { cell ->
+                cell.expandX().fillX().colspan(1)
+            }
+            row()
+
             creditsButton = textButton("Credits")
             row()
 
@@ -92,7 +104,16 @@ class HomeUI(
             val port = portTextField.text.toIntOrNull() ?: 8080
             onJoin(ip, port, udpDropRateTextField.text.toFloatOrNull() ?: 0f)
         }
+        searchForServerButton.onClick { onSearchForServer() }
         creditsButton.onClick { onCredits() }
         quitGameButton.onClick { onQuit() }
+    }
+
+    /**
+     * Updates the server address label. Called from the main thread after the
+     * discovery client reports a result or a timeout.
+     */
+    fun updateServerAddress(text: String) {
+        serverAddressLabel.setText(text)
     }
 }

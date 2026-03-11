@@ -13,18 +13,18 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import me.baldo3000.showdown.dto.AddressDTO
+import me.baldo3000.showdown.network.DISCOVERY_PORT
+import me.baldo3000.showdown.network.DISCOVERY_REQUEST
 import me.baldo3000.showdown.network.localIpv4Addresses
 import kotlin.text.toByteArray
 
-private const val DISCOVERY_PORT = 8081
-private const val DISCOVERY_REQUEST = "Lobby server where are you?"
 
 fun Application.configureDiscovery() {
     launch(Dispatchers.IO) {
         val socket = aSocket(SelectorManager(Dispatchers.IO)).udp().bind(port = DISCOVERY_PORT) { broadcast = true }
         val routingAddress = AddressDTO(localIpv4Addresses().first(), 8080)
         monitor.subscribe(ApplicationStopped) { socket.close() }
-        log.debug { "UDP discovery listener started on port $DISCOVERY_PORT" }
+        log.debug { "UDP discovery listener started on port ${DISCOVERY_PORT}" }
 
         try {
             while (isActive) {
