@@ -10,10 +10,12 @@ import io.ktor.server.routing.*
 import io.ktor.util.collections.*
 import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
-import me.baldo3000.showdown.dto.LobbiesDTO
 import me.baldo3000.showdown.dto.AddressDTO
+import me.baldo3000.showdown.dto.LobbiesDTO
+import me.baldo3000.showdown.network.LOBBIES_ROUTE
+import me.baldo3000.showdown.network.LOBBY_ROUTE
 
-const val LOBBY_EXPIRE_TIME_MS = 60 * 1000L // 1 minute
+const val LOBBY_EXPIRE_TIME_MS = 30 * 1000L // 30 seconds
 
 fun Application.configureRouting() {
     val lobbies = ConcurrentSet<Lobby>()
@@ -24,12 +26,13 @@ fun Application.configureRouting() {
     lobbies.add(Lobby("192.168.1.182", 89))
 
     routing {
-        get("/lobbies") {
+        get(LOBBIES_ROUTE) {
             removeExpiredLobbies(lobbies)
+            log.debug { "Responding to GET request at $LOBBIES_ROUTE route" }
             call.respond(LobbiesDTO(lobbies.map { AddressDTO(it.ip, it.port) }))
         }
 
-        post("/lobby") {
+        post(LOBBY_ROUTE) {
             try {
                 val addressDTO = call.receive<AddressDTO>()
                 log.debug { "Adding lobby: $addressDTO" }
@@ -45,7 +48,7 @@ fun Application.configureRouting() {
             }
         }
 
-        delete("/lobby") {
+        delete(LOBBY_ROUTE) {
             try {
                 val addressDTO = call.receive<AddressDTO>()
                 log.debug { "Removing lobby: $addressDTO" }

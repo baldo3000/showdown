@@ -4,6 +4,11 @@ import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.util.*
 
+const val LOBBIES_ROUTE = "/lobbies"
+const val LOBBY_ROUTE = "/lobby"
+const val DISCOVERY_PORT = 8081
+const val DISCOVERY_REQUEST = "Lobby server where are you?"
+
 fun localIpv4Addresses(): List<String> {
     val skipKeywords = listOf("vEthernet", "WSL", "Hyper-V")
 

@@ -11,6 +11,10 @@ import me.baldo3000.showdown.dto.AddressDTO
 private const val DISCOVERY_TIMEOUT_MS = 3000L
 private const val BROADCAST_ADDRESS = "255.255.255.255"
 
+/**
+ * Sends a UDP broadcast to the discovery port and waits for a lobby server
+ * to respond with its address. All network I/O is performed off the main thread.
+ */
 class LobbyDiscoveryClient {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var searchJob: Job? = null
@@ -70,4 +74,3 @@ class LobbyDiscoveryClient {
         private val log = logger<LobbyDiscoveryClient>()
     }
 }
-

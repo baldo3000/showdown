@@ -8,4 +8,5 @@ class NetworkConfig {
     var mode: Mode = Mode.HOST
     var hostAddress: Address = Address("127.0.0.1", 8080)
     var udpDropRate: Float = 0f
+    var lobbyServerAddress: Address? = null
 }

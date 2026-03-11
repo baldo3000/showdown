@@ -6,12 +6,14 @@ import ktx.actors.plusAssign
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
 import me.baldo3000.showdown.network.LobbyDiscoveryClient
+import me.baldo3000.showdown.network.LobbyHttpClient
 import me.baldo3000.showdown.network.NetworkConfig
 import me.baldo3000.showdown.network.api.Address
 import me.baldo3000.showdown.ui.HomeUI
 
 class HomeScreen(game: Showdown) : ShowdownScreen(game) {
     private val discoveryClient = LobbyDiscoveryClient()
+    private val lobbyHttpClient = LobbyHttpClient()
     private var ui: HomeUI
 
     init {
@@ -31,13 +33,29 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
                 ui.updateServerAddress("Searching...")
                 discoveryClient.search(
                     onResult = { address ->
-                        Gdx.app.postRunnable { ui.updateServerAddress("${address.ip}:${address.port}") }
+                        game.networkConfig.lobbyServerAddress = Address(address.ip, address.port)
+                        ui.updateServerAddress("${address.ip}:${address.port}")
                     },
                     onTimeout = {
-                        Gdx.app.postRunnable { ui.updateServerAddress("No server found") }
+                        game.networkConfig.lobbyServerAddress = null
+                        ui.updateServerAddress("No server found")
                     }
                 )
             },
+            onRefreshLobbies = {
+                val serverAddress = game.networkConfig.lobbyServerAddress
+                if (serverAddress == null) {
+                    ui.setLobbiesStatus("Search for a server first")
+                } else {
+                    ui.setLobbiesStatus("Loading...")
+                    lobbyHttpClient.fetchLobbies(
+                        lobbyServer = serverAddress,
+                        onResult = { lobbiesDTO -> ui.updateLobbies(lobbiesDTO.lobbies) },
+                        onTimeout = { ui.setLobbiesStatus("Failed to reach server") }
+                    )
+                }
+            },
+            onLobbySelected = { /* TODO: connect to selected lobby */ },
             onCredits = { log.debug { "Credits button clicked" } },
             onQuit = { Gdx.app.exit() }
         )
@@ -47,14 +65,12 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
         super.show()
         log.debug { "HomeScreen is shown" }
         stage += ui.table
-        stage += ui.udpDropRateTable
     }
 
     override fun hide() {
         super.hide()
         log.debug { "HomeScreen is hidden" }
         stage -= ui.table
-        stage -= ui.udpDropRateTable
     }
 
     override fun render(delta: Float) {
@@ -68,6 +84,7 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
 
     override fun dispose() {
         super.dispose()
+        lobbyHttpClient.dispose()
         discoveryClient.dispose()
     }
 
