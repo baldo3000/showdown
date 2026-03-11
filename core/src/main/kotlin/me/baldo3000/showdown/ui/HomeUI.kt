@@ -72,7 +72,7 @@ class HomeUI(
             searchForServerButton = textButton("Search for lobby server") { cell ->
                 cell.expandX().fillX().colspan(1)
             }
-            serverAddressLabel = label("No server found") { cell ->
+            serverAddressLabel = label("No server found. (Needed for posting and searching lobbies)") { cell ->
                 cell.expandX().fillX().colspan(1)
             }
             row()

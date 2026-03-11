@@ -5,15 +5,15 @@ import ktx.actors.minusAssign
 import ktx.actors.plusAssign
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
+import me.baldo3000.showdown.network.LobbiesHttpClient
 import me.baldo3000.showdown.network.LobbyDiscoveryClient
-import me.baldo3000.showdown.network.LobbyHttpClient
 import me.baldo3000.showdown.network.NetworkConfig
 import me.baldo3000.showdown.network.api.Address
 import me.baldo3000.showdown.ui.HomeUI
 
 class HomeScreen(game: Showdown) : ShowdownScreen(game) {
     private val discoveryClient = LobbyDiscoveryClient()
-    private val lobbyHttpClient = LobbyHttpClient()
+    private val lobbiesHttpClient = LobbiesHttpClient()
     private var ui: HomeUI
 
     init {
@@ -41,7 +41,7 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
                     onTimeout = {
                         Gdx.app.postRunnable {
                             game.networkConfig.lobbyServerAddress = null
-                            ui.updateServerAddress("No server found")
+                            ui.updateServerAddress("No server found. (Needed for posting and searching lobbies)")
                         }
                     }
                 )
@@ -52,7 +52,7 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
                     ui.setLobbiesStatus("Search for a server first")
                 } else {
                     ui.setLobbiesStatus("Loading...")
-                    lobbyHttpClient.fetchLobbies(
+                    lobbiesHttpClient.fetchLobbies(
                         lobbyServer = serverAddress,
                         onResult = { lobbiesDTO -> Gdx.app.postRunnable { ui.updateLobbies(lobbiesDTO.lobbies) } },
                         onTimeout = { Gdx.app.postRunnable { ui.setLobbiesStatus("Failed to reach server") } }
@@ -88,7 +88,7 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
 
     override fun dispose() {
         super.dispose()
-        lobbyHttpClient.dispose()
+        lobbiesHttpClient.dispose()
         discoveryClient.dispose()
     }
 

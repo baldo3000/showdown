@@ -20,19 +20,20 @@ import me.baldo3000.showdown.ecs.players
 import me.baldo3000.showdown.ecs.walls
 import me.baldo3000.showdown.game.EntityFactory
 import me.baldo3000.showdown.game.GameState
-import me.baldo3000.showdown.network.HostNetworkManager
-import me.baldo3000.showdown.network.NetworkConfig
-import me.baldo3000.showdown.network.PlayerInputPacket
-import me.baldo3000.showdown.network.WorldSnapshot
+import me.baldo3000.showdown.network.*
+import me.baldo3000.showdown.network.api.Address
 import kotlin.uuid.Uuid
 
 private const val UPDATE_RATE = 1 / 60f
+private const val SERVER_SIGNAL_UPDATE_RATE = 10f
 
 class HostSystem(
     private val networkConfig: NetworkConfig,
     private val entityFactory: EntityFactory,
     private val gameState: GameState
 ) : IntervalSystem(UPDATE_RATE) {
+    private val lobbyHttpClient = LobbyHttpClient()
+    private var accumulator = 0f
     private val networkManager: HostNetworkManager
     private var snapshotSequenceNumber = 0
     private var sessionId: Uuid = Uuid.random()
@@ -88,12 +89,18 @@ class HostSystem(
     override fun removedFromEngine(engine: Engine?) {
         super.removedFromEngine(engine)
         reset()
+        lobbyHttpClient.dispose()
     }
 
     override fun updateInterval() {
         Gdx.graphics.setTitle(
             "Showdown - Host listening on addresses ${networkManager.addresses}, port ${networkManager.port ?: "Unknown Port"} - Players: ${engine.players.size}"
         )
+        accumulator += UPDATE_RATE
+        if (accumulator >= SERVER_SIGNAL_UPDATE_RATE) {
+            accumulator -= SERVER_SIGNAL_UPDATE_RATE
+            updateLobbyServer()
+        }
         processIncomingMessages()
         broadcastWorldState()
     }
@@ -161,7 +168,16 @@ class HostSystem(
         }
     }
 
+    private fun updateLobbyServer(delete: Boolean = false) {
+        networkConfig.lobbyServerAddress?.let { lobbyServer ->
+            networkManager.port?.let { hostPort ->
+                lobbyHttpClient.updateLobby(lobbyServer, Address(localIpv4Addresses().first(), hostPort), delete)
+            }
+        }
+    }
+
     private fun reset() {
+        updateLobbyServer(true)
         networkManager.stop()
     }
 
