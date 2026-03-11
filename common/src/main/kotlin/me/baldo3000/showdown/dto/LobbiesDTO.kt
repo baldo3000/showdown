@@ -3,7 +3,7 @@ package me.baldo3000.showdown.dto
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LobbyDTO(val ip: String, val port: Int)
+data class AddressDTO(val ip: String, val port: Int)
 
 @Serializable
-data class LobbiesDTO(val lobbies: List<LobbyDTO>)
+data class LobbiesDTO(val lobbies: List<AddressDTO>)

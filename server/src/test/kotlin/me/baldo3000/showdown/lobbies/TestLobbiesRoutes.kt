@@ -10,7 +10,7 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.delay
 import me.baldo3000.showdown.dto.LobbiesDTO
-import me.baldo3000.showdown.dto.LobbyDTO
+import me.baldo3000.showdown.dto.AddressDTO
 import me.baldo3000.showdown.module
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -98,7 +98,7 @@ class TestLobbiesRoutes {
     companion object {
         private const val LOBBIES_URL = "/lobbies"
         private const val LOBBY_URL = "/lobby"
-        private val exampleLobby = LobbyDTO("127.0.0.1", 8080)
+        private val exampleLobby = AddressDTO("127.0.0.1", 8080)
         private val exampleNotLobby = listOf(1, 2, 3)
     }
 }

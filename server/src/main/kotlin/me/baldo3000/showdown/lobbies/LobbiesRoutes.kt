@@ -11,7 +11,7 @@ import io.ktor.util.collections.*
 import io.ktor.util.logging.*
 import kotlinx.serialization.SerializationException
 import me.baldo3000.showdown.dto.LobbiesDTO
-import me.baldo3000.showdown.dto.LobbyDTO
+import me.baldo3000.showdown.dto.AddressDTO
 
 const val LOBBY_EXPIRE_TIME_MS = 60 * 1000L // 1 minute
 
@@ -26,14 +26,14 @@ fun Application.configureRouting() {
     routing {
         get("/lobbies") {
             removeExpiredLobbies(lobbies)
-            call.respond(LobbiesDTO(lobbies.map { LobbyDTO(it.ip, it.port) }))
+            call.respond(LobbiesDTO(lobbies.map { AddressDTO(it.ip, it.port) }))
         }
 
         post("/lobby") {
             try {
-                val lobbyDTO = call.receive<LobbyDTO>()
-                log.debug { "Adding lobby: $lobbyDTO" }
-                val lobby = Lobby(lobbyDTO.ip, lobbyDTO.port)
+                val addressDTO = call.receive<AddressDTO>()
+                log.debug { "Adding lobby: $addressDTO" }
+                val lobby = Lobby(addressDTO.ip, addressDTO.port)
                 lobbies.add(lobby)
                 call.validLobby()
             } catch (_: ContentTransformationException) {
@@ -47,9 +47,9 @@ fun Application.configureRouting() {
 
         delete("/lobby") {
             try {
-                val lobbyDTO = call.receive<LobbyDTO>()
-                log.debug { "Removing lobby: $lobbyDTO" }
-                lobbies.remove(Lobby(lobbyDTO.ip, lobbyDTO.port))
+                val addressDTO = call.receive<AddressDTO>()
+                log.debug { "Removing lobby: $addressDTO" }
+                lobbies.remove(Lobby(addressDTO.ip, addressDTO.port))
                 call.validLobby()
             } catch (_: ContentTransformationException) {
                 call.invalidLobby()

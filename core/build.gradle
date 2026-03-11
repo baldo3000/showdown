@@ -40,6 +40,8 @@ dependencies {
 
   testImplementation libs.gdx.backend.headless
   testRuntimeOnly(variantOf(libs.gdx.platform) { classifier("natives-desktop") })
+
+  implementation(project(":common"))
 }
 
 tasks.test {

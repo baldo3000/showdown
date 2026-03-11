@@ -15,9 +15,6 @@ import me.baldo3000.showdown.network.api.Address
 import me.baldo3000.showdown.network.api.ConnectedPeer
 import me.baldo3000.showdown.network.api.Host
 import me.baldo3000.showdown.network.api.toAddress
-import java.net.Inet4Address
-import java.net.NetworkInterface
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.uuid.Uuid
@@ -179,30 +176,6 @@ class HostNetworkManager(
                 socket.close()
             }
         }
-    }
-
-    private fun localIpv4Addresses(): List<String> {
-        val skipKeywords = listOf("vEthernet", "WSL", "Hyper-V")
-
-        fun isFaceAllowed(netIf: NetworkInterface): Boolean {
-            val name = netIf.name ?: ""
-            val display = netIf.displayName ?: ""
-            return skipKeywords.none { kw ->
-                name.contains(kw, ignoreCase = true) || display.contains(
-                    kw,
-                    ignoreCase = true
-                )
-            }
-        }
-
-        return Collections.list(NetworkInterface.getNetworkInterfaces())
-            .asSequence()
-            .filter { it.isUp && isFaceAllowed(it) && !it.isLoopback }
-            .flatMap { Collections.list(it.inetAddresses).asSequence() }
-            .filterIsInstance<Inet4Address>()
-            .filter { !it.isLinkLocalAddress && !it.isLoopbackAddress }
-            .map { it.hostAddress }
-            .toList()
     }
 
     companion object {
