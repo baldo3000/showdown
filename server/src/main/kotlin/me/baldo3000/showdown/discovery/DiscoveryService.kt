@@ -24,7 +24,7 @@ fun Application.configureDiscovery() {
         val socket = aSocket(SelectorManager(Dispatchers.IO)).udp().bind(port = DISCOVERY_PORT) { broadcast = true }
         val routingAddress = AddressDTO(localIpv4Addresses().first(), 8080)
         monitor.subscribe(ApplicationStopped) { socket.close() }
-        log.debug { "UDP discovery listener started on port ${DISCOVERY_PORT}" }
+        log.debug { "UDP discovery listener started on port $DISCOVERY_PORT" }
 
         try {
             while (isActive) {
