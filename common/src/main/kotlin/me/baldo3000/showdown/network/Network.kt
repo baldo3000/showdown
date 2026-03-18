@@ -9,6 +9,25 @@ const val LOBBY_ROUTE = "/lobby"
 const val DISCOVERY_PORT = 8081
 const val DISCOVERY_REQUEST = "Lobby server where are you?"
 
+fun localBroadcastAddresses(): List<String> {
+    val skipKeywords = listOf("vEthernet", "WSL", "Hyper-V")
+    return Collections.list(NetworkInterface.getNetworkInterfaces())
+        .asSequence()
+        .filter { it.isUp && !it.isLoopback }
+        .filter { netIf ->
+            val name = netIf.name ?: ""
+            val display = netIf.displayName ?: ""
+            skipKeywords.none { kw -> name.contains(kw, ignoreCase = true) || display.contains(kw, ignoreCase = true) }
+        }
+        .flatMap { netIf ->
+            netIf.interfaceAddresses.asSequence()
+                .mapNotNull { it.broadcast } // InterfaceAddress.getBroadcast() may be null for point-to-point etc.
+        }
+        .map { it.hostAddress }
+        .distinct()
+        .toList()
+}
+
 fun localIpv4Addresses(): List<String> {
     val skipKeywords = listOf("vEthernet", "WSL", "Hyper-V")
 

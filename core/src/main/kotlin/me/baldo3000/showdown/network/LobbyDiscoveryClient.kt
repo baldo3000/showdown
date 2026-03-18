@@ -9,7 +9,7 @@ import ktx.log.logger
 import me.baldo3000.showdown.dto.AddressDTO
 
 private const val DISCOVERY_TIMEOUT_MS = 3000L
-private const val BROADCAST_ADDRESS = "255.255.255.255"
+private const val FALLBACK_BROADCAST_ADDRESS = "255.255.255.255"
 
 /**
  * Sends a UDP broadcast to the discovery port and waits for a lobby server
@@ -18,6 +18,7 @@ private const val BROADCAST_ADDRESS = "255.255.255.255"
 class LobbyDiscoveryClient {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var searchJob: Job? = null
+    val broadcastTargets = localBroadcastAddresses().ifEmpty { listOf(FALLBACK_BROADCAST_ADDRESS) }
 
     fun search(
         onResult: (AddressDTO) -> Unit,
@@ -32,13 +33,16 @@ class LobbyDiscoveryClient {
                 }
                 try {
                     val requestBytes = DISCOVERY_REQUEST.toByteArray()
-                    socket.send(
-                        Datagram(
-                            packet = buildPacket { writeFully(requestBytes) },
-                            address = InetSocketAddress(BROADCAST_ADDRESS, DISCOVERY_PORT)
+                    for (target in broadcastTargets) {
+                        socket.send(
+                            Datagram(
+                                packet = buildPacket { writeFully(requestBytes) },
+                                address = InetSocketAddress(target, DISCOVERY_PORT)
+                            )
                         )
-                    )
-                    log.debug { "Discovery broadcast sent to $BROADCAST_ADDRESS:$DISCOVERY_PORT" }
+                        log.debug { "Discovery broadcast sent to $target:$DISCOVERY_PORT" }
+                    }
+                    log.debug { "Discovery broadcast sent to $FALLBACK_BROADCAST_ADDRESS:$DISCOVERY_PORT" }
 
                     val addressDTO = withTimeoutOrNull(DISCOVERY_TIMEOUT_MS) {
                         val datagram = socket.receive()
