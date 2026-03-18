@@ -3,6 +3,7 @@ val appName: String by project
 plugins {
     id("application")
     alias(libs.plugins.kotlin.plugin.serialization)
+    id("com.gradleup.shadow") version "9.3.1"
 }
 
 tasks.withType<JavaCompile> {
@@ -49,4 +50,3 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
-
