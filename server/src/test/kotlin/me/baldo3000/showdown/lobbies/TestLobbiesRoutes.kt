@@ -9,8 +9,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.delay
-import me.baldo3000.showdown.dto.LobbiesDTO
 import me.baldo3000.showdown.dto.AddressDTO
+import me.baldo3000.showdown.dto.LobbiesDTO
 import me.baldo3000.showdown.module
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -27,7 +27,7 @@ class TestLobbiesRoutes {
     fun `getting at lobbies should return a LobbiesDTO`() = setUp { client ->
         val response = client.httpMethod(HttpMethod.Get, LOBBIES_URL)
         assertEquals(HttpStatusCode.OK, response.status)
-        assertEquals(ContentType.Application.Json.withCharset(Charsets.UTF_8), response.contentType())
+        assertEquals(ContentType.Application.Json, response.contentType())
         assertDoesNotThrow {
             response.body<LobbiesDTO>()
         }
