@@ -38,12 +38,10 @@ class LobbyHttpClient {
                             setBody(AddressDTO(hostAddress.ip, hostAddress.port))
                         }
                     } else {
-                        println("GAS1")
                         client.delete(url) {
                             contentType(ContentType.Application.Json)
                             setBody(AddressDTO(hostAddress.ip, hostAddress.port))
                         }
-                        println("GAS2")
                     }
                 }
             } catch (e: CancellationException) {
