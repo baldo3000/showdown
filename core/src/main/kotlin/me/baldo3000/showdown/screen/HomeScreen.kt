@@ -55,7 +55,6 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
                 }
             },
             onLobbySelected = ::joinLobby,
-            onCredits = { log.debug { "Credits button clicked" } },
             onQuit = { Gdx.app.exit() }
         )
     }

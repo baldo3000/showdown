@@ -18,7 +18,6 @@ class HomeUI(
     private val onSearchForServer: () -> Unit = {},
     private val onRefreshLobbies: () -> Unit = {},
     private val onLobbySelected: (String, Int, Float) -> Unit = { _, _, _ -> },
-    private val onCredits: () -> Unit = {},
     private val onQuit: () -> Unit = {}
 ) {
     val table: KTableWidget
@@ -30,7 +29,6 @@ class HomeUI(
     private val searchForServerButton: TextButton
     private val serverAddressLabel: Label
     private val refreshLobbiesButton: TextButton
-    private val creditsButton: TextButton
     private val quitGameButton: TextButton
     private val udpDropRateTextField: TextField
 
@@ -84,10 +82,6 @@ class HomeUI(
             add(lobbiesContainer).expandX().fillX().colspan(2)
             row()
 
-            // Credits
-            creditsButton = textButton("Credits")
-            row()
-
             // Quit
             quitGameButton = textButton("Quit game")
             row()
@@ -120,7 +114,6 @@ class HomeUI(
         }
         searchForServerButton.onClick { onSearchForServer() }
         refreshLobbiesButton.onClick { onRefreshLobbies() }
-        creditsButton.onClick { onCredits() }
         quitGameButton.onClick { onQuit() }
     }
 
