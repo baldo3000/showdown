@@ -2,6 +2,8 @@ package me.baldo3000.showdown.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.SortedIteratingSystem
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.ashley.allOf
@@ -21,6 +23,10 @@ class RenderSystem(
     override fun update(deltaTime: Float) {
         forceSort()
         gameViewport.apply()
+        // Background
+        Gdx.gl.glClearColor(0.25f, 0.25f, 0.25f, 1.0f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
         batch.use(gameViewport.camera.combined) {
             super.update(deltaTime)
         }
