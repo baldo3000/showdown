@@ -87,6 +87,10 @@ class ClientNetworkManager(
             } catch (_: ConnectException) { // Couldn't establish connection
                 log.error { "Couldn't connect to the host" }
                 onConnectionFailure()
+            } catch (_: IllegalArgumentException) { // Parameters not valid
+                log.error { "Couldn't connect to the host" }
+                onConnectionFailure()
+
             } catch (_: EOFException) { // Host closes channel
                 log.info { "Connection closed from host" }
                 onDisconnect()
