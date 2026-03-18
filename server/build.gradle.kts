@@ -16,7 +16,7 @@ java {
 }
 
 application {
-    mainClass.set("me.baldo3000.showdown.server.ServerKt")
+    mainClass.set("me.baldo3000.showdown.ServerKt")
 }
 
 plugins.withId("eclipse") {
