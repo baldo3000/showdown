@@ -32,7 +32,7 @@ class HostSystem(
     private val entityFactory: EntityFactory,
     private val gameState: GameState
 ) : IntervalSystem(UPDATE_RATE) {
-    private val lobbyHttpClient = LobbyHttpClient()
+    private val lobbyPostingHttpClient = LobbyPostingHttpClient()
     private var accumulator = 0f
     private val networkManager: HostNetworkManager
     private var snapshotSequenceNumber = 0
@@ -89,7 +89,7 @@ class HostSystem(
     override fun removedFromEngine(engine: Engine?) {
         super.removedFromEngine(engine)
         reset()
-        lobbyHttpClient.dispose()
+        lobbyPostingHttpClient.dispose()
     }
 
     override fun updateInterval() {
@@ -171,7 +171,7 @@ class HostSystem(
     private fun updateLobbyServer(delete: Boolean = false) {
         networkConfig.lobbyServerAddress?.let { lobbyServer ->
             networkManager.port?.let { hostPort ->
-                lobbyHttpClient.updateLobby(lobbyServer, Address(localIpv4Addresses().first(), hostPort), delete)
+                lobbyPostingHttpClient.updateLobby(lobbyServer, Address(localIpv4Addresses().first(), hostPort), delete)
             }
         }
     }

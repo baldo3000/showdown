@@ -13,7 +13,7 @@ import me.baldo3000.showdown.network.api.Address
 
 private const val TIMEOUT_MS = 3000L
 
-class LobbyHttpClient {
+class LobbyPostingHttpClient {
     private val client = HttpClient(CIO) {
         install(ContentNegotiation) {
             json()
@@ -58,6 +58,6 @@ class LobbyHttpClient {
     }
 
     companion object {
-        private val log = logger<LobbyHttpClient>()
+        private val log = logger<LobbyPostingHttpClient>()
     }
 }
