@@ -15,12 +15,12 @@ private const val FALLBACK_BROADCAST_ADDRESS = "255.255.255.255"
  * Sends a UDP broadcast to the discovery port and waits for a lobby server
  * to respond with its address. All network I/O is performed off the main thread.
  */
-class LobbyDiscoveryClient {
+class ServerDiscoveryClient {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var searchJob: Job? = null
     val broadcastTargets = localBroadcastAddresses().ifEmpty { listOf(FALLBACK_BROADCAST_ADDRESS) }
 
-    fun search(
+    fun discover(
         onResult: (AddressDTO) -> Unit,
         onTimeout: () -> Unit = {},
     ) {
@@ -75,6 +75,6 @@ class LobbyDiscoveryClient {
     }
 
     companion object {
-        private val log = logger<LobbyDiscoveryClient>()
+        private val log = logger<ServerDiscoveryClient>()
     }
 }

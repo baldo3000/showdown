@@ -6,13 +6,13 @@ import ktx.actors.plusAssign
 import ktx.log.logger
 import me.baldo3000.showdown.Showdown
 import me.baldo3000.showdown.network.LobbiesHttpClient
-import me.baldo3000.showdown.network.LobbyDiscoveryClient
+import me.baldo3000.showdown.network.ServerDiscoveryClient
 import me.baldo3000.showdown.network.NetworkConfig
 import me.baldo3000.showdown.network.api.Address
 import me.baldo3000.showdown.ui.HomeUI
 
 class HomeScreen(game: Showdown) : ShowdownScreen(game) {
-    private val discoveryClient = LobbyDiscoveryClient()
+    private val discoveryClient = ServerDiscoveryClient()
     private val lobbiesHttpClient = LobbiesHttpClient()
     private var ui: HomeUI
 
@@ -26,7 +26,7 @@ class HomeScreen(game: Showdown) : ShowdownScreen(game) {
             onJoin = ::joinLobby,
             onSearchForServer = {
                 ui.updateServerAddress("Searching...")
-                discoveryClient.search(
+                discoveryClient.discover(
                     onResult = { address ->
                         Gdx.app.postRunnable {
                             game.networkConfig.lobbyServerAddress = Address(address.ip, address.port)
